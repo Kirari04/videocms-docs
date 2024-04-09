@@ -8,3 +8,4 @@ description: Guides for VideoCMS
 
 - [Get Started](./guide/get-started.md "Get Started")
 - [Upload Video](./guide/upload-video.md "Upload Video")
+- [Custom Webpage](./guide/custom-webpage.md "Custom Webpage")
