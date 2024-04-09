@@ -1,7 +1,9 @@
 import { defaultTheme } from '@vuepress/theme-default'
 import { defineUserConfig } from 'vuepress/cli'
 import { viteBundler } from '@vuepress/bundler-vite'
-import { externalLinkIconPlugin } from '@vuepress/plugin-external-link-icon'
+import { copyCodePlugin } from '@vuepress/plugin-copy-code'
+import { tocPlugin } from '@vuepress/plugin-toc'
+import { searchPlugin } from '@vuepress/plugin-search'
 
 export default defineUserConfig({
   lang: 'en-US',
@@ -14,7 +16,8 @@ export default defineUserConfig({
 
     navbar: [
       '/',
-      '/get-started',
+      '/guide/get-started',
+      '/guide',
       { text: "GitHub", link: "https://github.com/Kirari04/videocms", target: "_blank" },
       { text: "Docker", link: "https://hub.docker.com/r/kirari04/videocms", target: "_blank" },
       { text: "Discord", link: "https://discord.gg/pHcstaPThK", target: "_blank" },
@@ -23,6 +26,14 @@ export default defineUserConfig({
 
   bundler: viteBundler(),
   plugins: [
-
+    copyCodePlugin({
+      // options
+    }),
+    tocPlugin({
+      // options
+    }),
+    searchPlugin({
+      // options
+    }),
   ]
 })

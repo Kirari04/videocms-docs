@@ -1,4 +1,12 @@
+---
+lang: en-US
+title: Get Started
+description: Getting started with VideoCMS
+---
+
 # Get Started
+
+[[toc]]
 
 ## Prerequisites
 
@@ -8,42 +16,7 @@ Make sure you have the latest [Docker](https://docs.docker.com/engine/install/) 
 
 Create a file named `docker-compose.yaml` with the following content.
 
-```yaml
-version: "3.8"
-services:
-  api:
-    image: kirari04/videocms:alpha
-    restart: unless-stopped
-    ports:
-      - "81:3000"
-    networks:
-      - videocmsnet
-    environment:
-      - Host=:3000 # [optional] on what port the container exposes the api
-      - FolderVideoQualitysPriv=./videos/qualitys # [optional] where the videos are stored inside the container
-      - FolderVideoUploadsPriv=./videos/uploads # [optional] where the uploads are stored inside the container
-      - StatsDriveName=nvme0n1 # [optional] the drive name where the uploads & videos are stored (for stats on dashboard)
-    volumes:
-      - ./videos:/app/videos
-      - ./database:/app/database
-  panel:
-    image: kirari04/videocms:panel
-    restart: unless-stopped
-    ports:
-      - "80:3000"
-    networks:
-      - videocmsnet
-    environment:
-      - NUXT_PUBLIC_API_URL=http://127.0.0.1:81/api # the url of the api
-      - NUXT_PUBLIC_BASE_URL=http://127.0.0.1:81 # the base url of the api server
-      - NUXT_PUBLIC_NAME=VideoCMS  # the name of the project
-    volumes:
-      - ./videos:/app/videos
-      - ./database:/app/database
-networks:
-  videocmsnet:
-    driver: bridge
-```
+@[code yaml title="docker-compose.yaml"](../../docker-compose.yaml)
 
 Run in the same directory the following command to start the application.
 

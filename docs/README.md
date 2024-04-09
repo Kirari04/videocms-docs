@@ -4,8 +4,11 @@ title: Home
 heroImage: https://raw.githubusercontent.com/Kirari04/videocms/master/public/logo.png
 actions:
   - text: Get Started
-    link: /get-started.html
+    link: /guide/get-started.html
     type: primary
+  - text: Guides
+    link: /guide
+    type: secundary
 
 features:
   - title: Selfhost

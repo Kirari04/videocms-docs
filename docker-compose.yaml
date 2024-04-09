@@ -26,9 +26,6 @@ services:
       - NUXT_PUBLIC_API_URL=http://127.0.0.1:81/api # the url of the api
       - NUXT_PUBLIC_BASE_URL=http://127.0.0.1:81 # the base url of the api server
       - NUXT_PUBLIC_NAME=VideoCMS  # the name of the project
-    volumes:
-      - ./videos:/app/videos
-      - ./database:/app/database
 networks:
   videocmsnet:
     driver: bridge
