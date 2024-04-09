@@ -7,4 +7,4 @@ description: Guides for VideoCMS
 # Guides
 
 - [Get Started](./guide/get-started.md "Get Started")
-- [Upload Video](./guide/get-started.md "Get Started")
+- [Upload Video](./guide/upload-video.md "Upload Video")
