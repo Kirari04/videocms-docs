@@ -18,6 +18,7 @@ export default defineUserConfig({
       '/',
       '/guide/get-started',
       '/guide',
+      '/screenshots',
       { text: "GitHub", link: "https://github.com/Kirari04/videocms", target: "_blank" },
       { text: "Docker", link: "https://hub.docker.com/r/kirari04/videocms", target: "_blank" },
       { text: "Discord", link: "https://discord.gg/pHcstaPThK", target: "_blank" },

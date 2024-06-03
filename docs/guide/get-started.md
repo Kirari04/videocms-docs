@@ -65,6 +65,8 @@ Next you will have to navigate to the [Config Page](http://127.0.0.1/my/config).
 
 Replace the Values of `JwtSecretKey` and `JwtUploadSecretKey` with a random string that can be up to 512 characters.
 
+Replace the Value of `BaseUrl` to the url of your server.
+
 Make sure to save the changes using the **save button** at the bottom of the page.
 
 > Make the keys of 32 or longer length so its more difficult to guess.
