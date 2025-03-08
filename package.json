@@ -12,16 +12,17 @@
     "docs:update-package": "npx vp-update"
   },
   "devDependencies": {
-    "@vuepress/bundler-vite": "^2.0.0-rc.7",
+    "@vuepress/bundler-vite": "^2.0.0-rc.20",
     "@vuepress/theme-default": "^2.0.0-rc.82",
+    "sass": "^1.85.1",
     "vue": "^3.5.13",
     "vuepress": "^2.0.0-rc.20"
   },
   "dependencies": {
-    "@vuepress/plugin-copy-code": "next",
-    "@vuepress/plugin-photo-swipe": "next",
-    "@vuepress/plugin-search": "next",
-    "@vuepress/plugin-toc": "next",
+    "@vuepress/plugin-copy-code": "^2.0.0-rc.20",
+    "@vuepress/plugin-photo-swipe": "^2.0.0-rc.20",
+    "@vuepress/plugin-search": "^2.0.0-rc.82",
+    "@vuepress/plugin-toc": "^2.0.0-rc.20",
     "caniuse-lite": "^1.0.30001702"
   }
 }
