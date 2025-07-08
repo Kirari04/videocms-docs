@@ -35,7 +35,7 @@ First, you need to add the `pgsplugin` service to your `docker-compose.yaml` fil
 
 Open your `docker-compose.yaml` and add the following under the `services:` section:
 
-'''yaml
+```yaml
 services:
   # ... your other services like api, panel, caddy ...
 
@@ -44,7 +44,7 @@ services:
     restart: unless-stopped
     networks:
       - videocmsnet
-'''
+```
 
 ### Step 2: Restart Docker Compose
 
@@ -52,13 +52,13 @@ After saving your changes to the `docker-compose.yaml` file, you must restart yo
 
 Run the following commands in your terminal:
 
-'''bash
+```bash
 # Shut down the existing containers
 docker compose down
 
 # Start all services, including the new pgsplugin
 docker compose up -d
-'''
+```
 
 ### Step 3: Configure the Plugin in VideoCMS
 
@@ -78,7 +78,7 @@ Now that the service is running, you need to tell VideoCMS how to communicate wi
 
 For clarity, here is a complete `docker-compose.yaml` file that includes the `pgsplugin` service.
 
-'''yaml
+```yaml
 version: "3.8"
 
 services:
@@ -126,4 +126,4 @@ networks:
 
 volumes:
   caddy_data: {}
-'''
+```
