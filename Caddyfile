@@ -1,0 +1,7 @@
+player.example.com {
+    reverse_proxy panel:3000
+}
+
+api-player.example.com {
+    reverse_proxy api:3000
+}

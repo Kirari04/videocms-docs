@@ -10,69 +10,53 @@ description: Getting started with VideoCMS
 
 ## Prerequisites
 
-Make sure you have the latest [Docker](https://docs.docker.com/engine/install/) installed.
+- A server with Docker and Docker Compose installed.
+- A registered domain name.
+- Point the domains `player.example.com` and `api-player.example.com` to the public IP address of your server.
 
-## Setup with a compose file
+## Setup
 
-Create a file named `docker-compose.yaml` with the following content.
+1.  **Create a directory for your VideoCMS installation:**
 
-@[code yaml title="docker-compose.yaml"](../../docker-compose.yaml)
+    ```sh
+    mkdir videocms
+    cd videocms
+    ```
 
-Run in the same directory the following command to start the application.
+2.  **Create a `docker-compose.yaml` file:**
 
-```sh
-docker compose up -d
-```
+    Create a file named `docker-compose.yaml` with the following content. This configuration uses Caddy to automatically handle HTTPS for your domains.
 
-## Create User
+    @[code yaml title="docker-compose.yaml"](../../docker-compose.yaml)
 
-Currently creating a user is only possible using the cli.
+3.  **Create a `Caddyfile`:**
 
-Because of that we have to identify our api container first.
-```sh
-docker ps
-```
+    Create a file named `Caddyfile` and replace `player.example.com` and `api-player.example.com` with your actual domains.
 
-**Example**
-```sh
-docker ps
+    @[code Caddyfile title="Caddyfile"](../../Caddyfile)
 
-CONTAINER ID   IMAGE                           COMMAND                  CREATED          STATUS          PORTS                                                                                            NAMES
-4a840427cc53   kirari04/videocms:panel         "bun run .output/ser…"   53 seconds ago   Up 52 seconds   0.0.0.0:80->3000/tcp, :::80->3000/tcp                                                            videocms-docs-panel-1
-78bfbdec7bc4   kirari04/videocms:alpha         "./main.bin serve:ma…"   53 seconds ago   Up 52 seconds   0.0.0.0:81->3000/tcp, :::81->3000/tcp
-```
+4.  **Start the application:**
 
-Copy the container id from the container where the image says `kirari04/videocms:alpha` and run the following command.
-```sh
-docker exec -it <container-id> /app/main.bin create:user
-```
+    Run the following command to start all services.
 
-**Example**
-```sh
-docker exec -it 78bfbdec7bc4 /app/main.bin create:user
+    ```sh
+    docker compose up -d
+    ```
 
-Enter Username: root
-Enter Password: 
-Enter IsAdmin[yes|no]: yes
-Created user:  1 root
-```
+## Initial Configuration
 
-## Modify Settings (Security)
+On the first startup, a default user with the username `admin` and the password `12345678` is created.
 
-Now you can open the panel on [http://127.0.0.1/login](http://127.0.0.1/login) and login using the account credentials you just created in the previous step.
+You can now open the panel on `https://player.example.com/login` and login using the default credentials.
 
-Next you will have to navigate to the [Config Page](http://127.0.0.1/my/config).
+Next, navigate to the Config Page at `https://player.example.com/my/config`.
 
-Replace the Values of `JwtSecretKey` and `JwtUploadSecretKey` with a random string that can be up to 512 characters.
-
-Replace the Value of `BaseUrl` to the url of your server.
+Replace the Value of `BaseUrl` with the URL of your API, which is `https://api-player.example.com`.
 
 Make sure to save the changes using the **save button** at the bottom of the page.
 
-> Make the keys of 32 or longer length so its more difficult to guess.
-> You can use a random password generator like the one from [Bitwarden](https://bitwarden.com/password-generator/#password-generator).
+After modifying the settings you should restart the containers.
 
-After modifying the settings you should restart the contaiers.
 ```sh
 docker compose down
 docker compose up -d
@@ -80,7 +64,7 @@ docker compose up -d
 
 ## Start Sharing Videos
 
-You can now navigate to the [Video Page](http://127.0.0.1/my/videos) and start uploading your first clip by pressing **start upload**.
+You can now navigate to the Video Page at `https://player.example.com/my/videos` and start uploading your first clip by pressing **start upload**.
 
 ![Upload Example](./assets/upload_example.png)
 
