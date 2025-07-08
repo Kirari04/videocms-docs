@@ -1,4 +1,12 @@
+---
+lang: en-US
+title: Encoding Quality Settings
+description: Encoding Quality Settings on VideoCMS
+---
+
 # Encoding Quality Settings
+
+[[toc]]
 
 This guide explains how to adjust the encoding quality settings in VideoCMS to balance video quality, storage, and bandwidth.
 
