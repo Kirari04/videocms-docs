@@ -10,3 +10,4 @@ description: Guides for VideoCMS
 - [PGS Subtitle Support](./guide/pgs-subtitle-support.md "PGS Subtitle Support")
 - [Upload Video](./guide/upload-video.md "Upload Video")
 - [Custom Webpage](./guide/custom-webpage.md "Custom Webpage")
+- [Encoding Quality Settings](./guide/encoding-quality-settings.md "Encoding Quality Settings")
