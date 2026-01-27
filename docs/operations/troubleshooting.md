@@ -68,8 +68,45 @@ docker compose logs -f videocms
 ## Performance
 
 ### Video playback buffers frequently
-*   **Cause:** The server CPU cannot keep up with transcoding (if using dynamic download) or the bandwidth is saturated.
-*   **Solution:**
-    *   **Pre-transcoding:** Ensure HLS master playlists are generated (Processing status is "Ready").
-    *   **CDN:** Use Cloudflare to cache the video segments (`.ts` files).
-    *   **CPU:** Upgrade to a server with more CPU cores if you have many concurrent viewers.
+
+When users experience buffering, it is rarely the CPU's fault. VideoCMS runs FFmpeg with a high `niceness` level, meaning the system prioritizes the API and web traffic over background encoding tasks. If the web server is responsive but video segments load slowly, you need to investigate other bottlenecks.
+
+#### 1. Network Bandwidth
+The most common cause is insufficient uplink from your server to the internet or a specific region.
+
+*   **Test Raw Bandwidth:** Run a speed test to a known high-bandwidth node.
+    ```bash
+    # Using iperf3 to test raw throughput (multi-threaded)
+    iperf3 -c ping.online.net -p 5201 -P 30
+    ```
+*   **Check Real-time Usage:** Use `nload` or `iftop` to see if your server's network interface is hitting its limit during peak hours.
+
+#### 2. Network Routing (Peering)
+Sometimes the "raw" speed is fine, but the route between your server and the user is unoptimal or congested.
+
+*   **Investigation:** Ask the user for their IP and run a traceroute or `mtr` from the server to them.
+    ```bash
+    # Check for packet loss and latency at each hop
+    mtr -rw [USER_IP]
+    ```
+*   **Solution:** Using a CDN like **Cloudflare** can drastically improve this by serving segments from a PoP (Point of Presence) closer to the user.
+
+#### 3. Storage I/O (Disk Speed)
+If you are using slow HDDs or a congested network share (NFS/CIFS), the disk might not be able to read the video segments fast enough for multiple concurrent viewers.
+
+*   **Check I/O Wait:** Run `top` or `htop` and look at the `%wa` (IO Wait) percentage. If this is consistently above 10-15%, your disks are struggling to keep up.
+*   **Monitor Disk Activity:** Use `iotop` to see which process is saturated.
+    ```bash
+    # See real-time disk read/write speeds per process
+    iotop -o
+    ```
+*   **Solution:** Move the `videos` directory to an SSD or NVMe drive.
+
+#### 4. Memory and Swapping
+If the server runs out of RAM, it will start "swapping" to the disk, which is extremely slow and causes the entire system to lag.
+
+*   **Check Swap Usage:** Run `free -m`. If `Swap` is heavily used, your server needs more RAM.
+    ```bash
+    free -m
+    ```
+

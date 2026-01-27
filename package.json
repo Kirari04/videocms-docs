@@ -11,8 +11,12 @@
     "dev": "vitepress dev docs"
   },
   "devDependencies": {
+    "medium-zoom": "^1.1.0",
+    "mermaid": "^11.12.2",
     "sass": "^1.97.3",
     "vitepress": "^1.6.4",
+    "vitepress-plugin-mermaid": "^2.0.17",
+    "vitepress-plugin-tabs": "^0.7.3",
     "vue": "^3.5.27"
   },
   "dependencies": {

@@ -1,42 +1,42 @@
 ---
 lang: en-US
-title: PGS Subtitle Support
-description: PGS Subtitle Support on VideoCMS
+title: Subtitle Support
+description: How VideoCMS handles standard and PGS subtitles
 ---
 
-# PGS Subtitle Support
+# Subtitle Support
 
+VideoCMS provides comprehensive support for various subtitle formats, ensuring your audience can enjoy content in their preferred language.
 
-This guide provides a step-by-step walkthrough for enabling **PGS (Presentation Graphics Stream)** subtitle support in your VideoCMS instance.
+## Standard Subtitles (Out of the Box)
 
-## What are PGS Subtitles?
+Most common text-based subtitle formats are supported **automatically** without any additional configuration. When you upload a video, VideoCMS extracts and processes internal subtitle tracks into web-friendly formats:
 
-PGS subtitles are an **image-based subtitle format** commonly found on Blu-ray discs. Unlike text-based subtitles (like SRT), each PGS subtitle is a picture. Enabling this feature allows VideoCMS to automatically extract these image-based subtitles, convert them into the text-based SRT format, and display them on your videos.
+-   **VTT (WebVTT)**: The standard format for web video players, ensuring broad compatibility across devices.
+-   **ASS (Advanced Substation Alpha)**: Supported for more complex styling and positioning.
 
----
-
-## Prerequisites
-
-Before you start, make sure you have the following:
-
-* **Server Access:** You'll need access to the server where your VideoCMS instance is running.
-* **Docker Knowledge:** A basic understanding of how to use Docker and modify a `docker-compose.yaml` file is necessary.
+These subtitles are extracted using FFmpeg during the video processing phase and will be available in the player as soon as the encoding is complete.
 
 ---
 
-## Configuration Steps
+## PGS Subtitle Support (Optional Plugin)
 
-Enabling PGS support involves adding a new service to your Docker Compose setup and then configuring it within the VideoCMS admin panel.
+**PGS (Presentation Graphics Stream)** subtitles are an **image-based format** commonly found on Blu-ray discs. Unlike text-based subtitles, each PGS subtitle is a bitmap image.
+
+To display these on the web, VideoCMS must extract these images and convert them into text using OCR (Optical Character Recognition). This requires an optional plugin.
+
+### Prerequisites
+
+-   **Server Access**: You'll need to modify your `docker-compose.yaml`.
+-   **Docker Knowledge**: Familiarity with restarting services.
 
 ### Step 1: Add the PGS Plugin Service
 
-First, you need to add the `pgsplugin` service to your `docker-compose.yaml` file. This service is a dedicated container that handles the subtitle extraction and conversion process.
-
-Open your `docker-compose.yaml` and add the following under the `services:` section:
+Add the `pgsplugin` service to your `docker-compose.yaml` file. This service handles the heavy lifting of image-to-text conversion.
 
 ```yaml
 services:
-  # ... your other services like api, panel, caddy ...
+  # ... your other services ...
 
   pgsplugin:
     image: kirari04/videocms:plugin-pgs
@@ -45,86 +45,29 @@ services:
       - videocmsnet
 ```
 
-### Step 2: Restart Docker Compose
+### Step 2: Restart Services
 
-After saving your changes to the `docker-compose.yaml` file, you must restart your services for the new container to be created and started.
-
-Run the following commands in your terminal:
+Apply the changes by restarting your Docker containers:
 
 ```bash
-# Shut down the existing containers
-docker compose down
-
-# Start all services, including the new pgsplugin
 docker compose up -d
 ```
 
-### Step 3: Configure the Plugin in VideoCMS
+### Step 3: Enable in Admin Panel
 
-Now that the service is running, you need to tell VideoCMS how to communicate with it.
+Once the plugin is running, you must enable it in your VideoCMS configuration:
 
-1.  Navigate to your VideoCMS settings page (usually at `/my/config`).
-2.  Find the **"Plugin Settings"** section.
-3.  Enable the **"Plugin PGS Server"** option (this is likely a checkbox).
-4.  Set the **"Plugin PGS Server" address** to: `http://pgsplugin:5000`
+1.  Navigate to **Settings** (`/my/config`) in your dashboard.
+2.  Find the **Plugin Settings** section.
+3.  Enable **Plugin PGS Server**.
+4.  Set the **Plugin PGS Server Address** to: `http://pgsplugin:5000`
 
-> ### Experimental Feature Notice
-> Please be aware that this is an **experimental feature**. While it enables videos with PGS subtitles to be processed, the resulting SRT conversion may not always be perfectly formatted or styled.
+::: warning Experimental Feature
+The PGS conversion process is resource-intensive and uses OCR. While it enables support for Blu-ray subtitles, the resulting text may occasionally contain minor formatting or recognition errors.
+:::
 
 ---
 
-## Full `docker-compose.yaml` Example
+## Technical Details
 
-For clarity, here is a complete `docker-compose.yaml` file that includes the `pgsplugin` service.
-
-```yaml
-services:
-  api:
-    image: kirari04/videocms:alpha
-    restart: unless-stopped
-    networks:
-      - videocmsnet
-    volumes:
-      - ./videos:/app/videos
-      - ./database:/app/database
-
-  panel:
-    image: kirari04/videocms:panel
-    restart: unless-stopped
-    networks:
-      - videocmsnet
-    environment:
-      - NUXT_PUBLIC_API_URL=https://api-player.example.com/api
-      - NUXT_PUBLIC_BASE_URL=https://api-player.example.com
-      - NUXT_PUBLIC_NAME=VideoCMS
-
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-    networks:
-      - videocmsnet
-
-  # This is the new service for handling PGS subtitles
-  pgsplugin:
-    image: kirari04/videocms:plugin-pgs
-    restart: unless-stopped
-    networks:
-      - videocmsnet
-
-networks:
-  videocmsnet:
-    driver: bridge
-
-volumes:
-  caddy_data: {}
-```
-
-## See Also
-
-- [Configuration Reference](../reference/configuration.md) - For more details on plugin configuration.
+VideoCMS uses FFmpeg to map and transcode subtitle streams. For standard tracks, it maps the stream directly (e.g., `-map 0:s:0`). For PGS tracks, it first routes the data through the PGS plugin to generate a temporary SRT file before final conversion to VTT or ASS.

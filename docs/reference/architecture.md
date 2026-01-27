@@ -4,10 +4,23 @@ title: Architecture
 description: Under the hood of VideoCMS - Encoding pipeline and Storage structure.
 ---
 
-# Architecture & "Under the Hood"
+# Architecture
 
+VideoCMS v0.1.0 (Beta) uses a unified architecture where the backend (API) and frontend (Panel) are served by a single service.
 
-Understanding how VideoCMS processes and stores files is crucial for debugging, scaling, and managing storage.
+## High-Level Overview
+
+```mermaid
+graph TD
+    User((User)) -->|HTTPS| Proxy[Reverse Proxy]
+    Proxy -->|Port 3000| CMS[VideoCMS Unified Service]
+    CMS -->|SQLite| DB[(Database)]
+    CMS -->|Filesystem| Storage[/videos/qualitys/]
+    CMS -.->|Internal| PGS[PGS Plugin]
+```
+
+## Service Components
+
 
 ## The Transcoding Pipeline
 
@@ -49,20 +62,21 @@ This is the main storage volume. You should **never** manually delete files here
 ./videos/
 ├── uploads/                  # Temporary staging area for raw uploads
 │   ├── {session_uuid}/       # Active upload session chunks
-│   └── {file_uuid}.tmp       # The ORIGINAL raw uploaded video (Source)
+│   └── {file_uuid}.tmp       # The assembled raw video (Temporary)
 │
-├── {video_uuid}/             # The processed video folder (HLS assets)
-│   ├── {quality_name}/       # e.g., "1080p", "720p"
-│   │   ├── index.m3u8        # Playlist for this specific quality
-│   │   ├── segment0.ts       # Video segment 0
-│   │   └── segment1.ts       # Video segment 1...
-│   │
-│   ├── {audio_uuid}/         # Audio Track 1
-│   │   ├── index.m3u8
-│   │   └── segment0.ts
-│   │
-│   └── {subtitle_uuid}/      # Subtitle Track 1
-│       └── subtitle.vtt      # The subtitle file
+└── qualitys/                 # Permanent storage for processed media
+    └── {video_uuid}/         # The processed video folder (HLS assets)
+        ├── {quality_name}/   # e.g., "1080p", "720p"
+        │   ├── index.m3u8    # Playlist for this specific quality
+        │   ├── segment0.ts   # Video segment 0
+        │   └── segment1.ts   # Video segment 1...
+        │
+        ├── {audio_uuid}/     # Audio Track 1
+        │   ├── index.m3u8
+        │   └── segment0.ts
+        │
+        └── {subtitle_uuid}/  # Subtitle Track 1
+            └── subtitle.vtt  # The subtitle file
 ```
 
 ### Where is `master.m3u8`?

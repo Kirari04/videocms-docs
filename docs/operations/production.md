@@ -9,7 +9,11 @@ description: Deploying VideoCMS in production with Reverse Proxies
 
 For production environments, it is highly recommended to run VideoCMS behind a reverse proxy to handle SSL termination, compression, and static file serving.
 
-## Option 1: Caddy (Recommended)
+## Reverse Proxy Options
+
+::: tabs
+== Caddy (Recommended)
+<div id="caddyfile"></div>
 
 Caddy is the easiest way to get running with automatic HTTPS.
 
@@ -42,15 +46,16 @@ volumes:
 
 Replace `video.example.com` with your domain.
 
-```caddy
+```caddyfile
 video.example.com {
     reverse_proxy videocms:3000
 }
 ```
 
-## Option 2: Nginx
+== Nginx
+<div id="option-2-nginx"></div>
 
-If you prefer Nginx, you can use the following configuration. Note that you will need to manage SSL certificates yourself (e.g., using Certbot) or use a separate container like `nginx-proxy` or `traefik`.
+If you prefer Nginx, you can use the following configuration. Note that you will need to manage SSL certificates yourself.
 
 ### Nginx Configuration
 
@@ -59,19 +64,18 @@ server {
     listen 80;
     server_name video.example.com;
 
-    client_max_body_size 10M; # Default limit for standard requests
+    client_max_body_size 10M;
 
     location / {
-        proxy_pass http://localhost:3000; # Points to the VideoCMS container
+        proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Increase limit specifically for chunk uploads
     location /api/pcu/chunck {
-        client_max_body_size 100M; # Must be larger than 'MaxUploadChuncksize' (default 20MB)
+        client_max_body_size 100M;
         proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -80,6 +84,7 @@ server {
     }
 }
 ```
+:::
 
 ## SSL Certificates
 
@@ -87,3 +92,29 @@ If you are not using Caddy (which handles SSL automatically) or Cloudflare, you 
 
 1.  **Certbot:** Use `certbot` on your host machine to generate certificates for your domains.
 2.  **Mount Certificates:** Mount the certificate files into your Nginx container and update the Nginx config to listen on port 443 and use the certificates.
+
+---
+
+## Mandatory Post-Deployment Security
+
+Deploying the containers is only the first step. You **must** perform these actions immediately after your first login to ensure your server is not compromised.
+
+### 1. Change Secret Keys
+By default, the application might use insecure or placeholder keys for signing session tokens.
+- Navigate to **Settings** (`/my/config`).
+- Change `JwtSecretKey` and `JwtUploadSecretKey` to long, random strings.
+- **Restart the containers** after saving.
+
+### 2. Trust Reverse Proxy (IP Identification)
+To ensure VideoCMS correctly identifies the visitor's IP address (important for logs and rate-limiting), you must enable **TrustLocalTraffic** in the settings.
+- Navigate to **Settings** (`/my/config`).
+- Set `TrustLocalTraffic` to `true`.
+- Without this, all users will appear to have the internal IP of your Caddy/Nginx container.
+
+### 3. Change Admin Password
+The default admin credentials (`admin` / `12345678`) are public knowledge. Change them immediately upon your first login.
+
+---
+
+For a comprehensive list of security measures, including firewall configuration and secret key management, please refer to the [Post-Installation Security](./security.md) guide.
+

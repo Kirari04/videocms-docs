@@ -32,10 +32,35 @@ The application uses JWT tokens for session management. You **must** change the 
 
 Ensure that development features are disabled in production.
 
-1.  **Trust Local Traffic**: Set to `false` if your instance is exposed to the internet.
-2.  **Reload Html**: Set to `false`.
+1.  **Trust Local Traffic**: Set to `true` if you are using a reverse proxy (Caddy, Nginx, Cloudflare). This allows VideoCMS to trust the `X-Forwarded-For` headers and see the user's real IP instead of the proxy's internal IP.
 
-## 4. Rate Limiting
+## 4. Firewall & Docker Caveats
+
+By default, **Docker bypasses UFW** by manipulating `iptables` directly. If you expose a port in your `docker-compose.yaml` (e.g., `ports: - "3000:3000"`), it will be accessible from the internet even if UFW is active.
+
+-   **Recommendation:** Only expose ports 80 and 443 for your reverse proxy (Caddy/Nginx).
+-   **Internal Services:** If you must expose the VideoCMS port to the host machine for an external Nginx setup, bind it to `127.0.0.1` so it is not accessible from the outside:
+    ```yaml
+    services:
+      videocms:
+        ports:
+          - "127.0.0.1:3000:3000" # Accessible only from the host
+    ```
+
+### UFW Setup
+Even if Docker bypasses it for exposed ports, a firewall is still essential for protecting other services (like SSH).
+
+```bash
+# Allow SSH
+ufw allow ssh
+# Allow Web Traffic
+ufw allow http
+ufw allow https
+# Enable Firewall
+ufw enable
+```
+
+## 5. Rate Limiting
 
 Enable rate limiting to protect your API from abuse.
 
