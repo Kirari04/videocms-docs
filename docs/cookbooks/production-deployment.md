@@ -18,24 +18,12 @@ Caddy is the easiest way to get running with automatic HTTPS.
 
 ```yaml
 services:
-  api:
-    image: kirari04/videocms:alpha
+  videocms:
+    image: kirari04/videocms:beta
     restart: unless-stopped
-    networks:
-      - videocmsnet
     volumes:
       - ./videos:/app/videos
       - ./database:/app/database
-
-  panel:
-    image: kirari04/videocms:panel
-    restart: unless-stopped
-    networks:
-      - videocmsnet
-    environment:
-      - NUXT_PUBLIC_API_URL=https://api-player.example.com/api
-      - NUXT_PUBLIC_BASE_URL=https://api-player.example.com
-      - NUXT_PUBLIC_NAME=VideoCMS
 
   caddy:
     image: caddy:2-alpine
@@ -46,12 +34,6 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
-    networks:
-      - videocmsnet
-
-networks:
-  videocmsnet:
-    driver: bridge
 
 volumes:
   caddy_data: {}
@@ -59,15 +41,11 @@ volumes:
 
 ### `Caddyfile`
 
-Replace `player.example.com` and `api-player.example.com` with your domains.
+Replace `video.example.com` with your domain.
 
 ```caddy
-player.example.com {
-    reverse_proxy panel:3000
-}
-
-api-player.example.com {
-    reverse_proxy api:8080
+video.example.com {
+    reverse_proxy videocms:3000
 }
 ```
 
@@ -80,25 +58,22 @@ If you prefer Nginx, you can use the following configuration. Note that you will
 ```nginx
 server {
     listen 80;
-    server_name player.example.com;
+    server_name video.example.com;
+
+    client_max_body_size 10M; # Default limit for standard requests
 
     location / {
-        proxy_pass http://localhost:3000; # Points to the Panel container
+        proxy_pass http://localhost:3000; # Points to the VideoCMS container
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
-}
 
-server {
-    listen 80;
-    server_name api-player.example.com;
-
-    client_max_body_size 10G; # Important for large video uploads
-
-    location / {
-        proxy_pass http://localhost:8080; # Points to the API container
+    # Increase limit specifically for chunk uploads
+    location /api/pcu/chunck {
+        client_max_body_size 100M; # Must be larger than 'MaxUploadChuncksize' (default 20MB)
+        proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
