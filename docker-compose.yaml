@@ -1,35 +1,10 @@
 version: "3.8"
 services:
-  api:
-    image: kirari04/videocms:alpha
+  videocms:
+    image: kirari04/videocms:beta
     restart: unless-stopped
-    networks:
-      - videocmsnet
+    ports:
+      - "3000:3000"
     volumes:
       - ./videos:/app/videos
       - ./database:/app/database
-  panel:
-    image: kirari04/videocms:panel
-    restart: unless-stopped
-    networks:
-      - videocmsnet
-    environment:
-      - NUXT_PUBLIC_API_URL=https://api-player.example.com/api
-      - NUXT_PUBLIC_BASE_URL=https://api-player.example.com
-      - NUXT_PUBLIC_NAME=VideoCMS
-  caddy:
-    image: caddy:2-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-    networks:
-      - videocmsnet
-networks:
-  videocmsnet:
-    driver: bridge
-volumes:
-  caddy_data: {}
