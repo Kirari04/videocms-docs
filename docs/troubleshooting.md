@@ -15,11 +15,8 @@ This guide lists common problems you might encounter while running VideoCMS and 
 First, always check the logs. They provide the exact error message coming from the backend or ffmpeg.
 
 ```bash
-# View logs for the API/Backend
-docker compose logs -f api
-
-# View logs for the Frontend Panel
-docker compose logs -f panel
+# View logs for the main service
+docker compose logs -f videocms
 ```
 
 ## Upload Issues
@@ -30,7 +27,7 @@ docker compose logs -f panel
     *   **Nginx:** Ensure `client_max_body_size` is larger than your **Chunk Size** (default 20MB). We recommend setting it to `50M` or higher.
     *   **Cloudflare:** Free accounts limit upload bodies to 100MB. Ensure your `MaxUploadChuncksize` in the VideoCMS config is set to `50000000` (50MB) or less.
 *   **Cause:** CORS issues if `BaseUrl` is not set correctly.
-*   **Solution:** Check your browser's dev tools (Console/Network tab). If you see CORS errors, ensure `NUXT_PUBLIC_API_URL` and the admin panel `BaseUrl` match your public domain.
+*   **Solution:** Check your browser's dev tools (Console/Network tab). If you see CORS errors, ensure the admin panel `BaseUrl` matches your public domain.
 
 ### "Exceeded max upload sessions"
 *   **Cause:** Too many users are uploading at once, or you have "ghost" sessions from failed uploads.
@@ -43,7 +40,7 @@ docker compose logs -f panel
 ### Video stays in "Processing" forever
 *   **Cause:** FFmpeg crashed or was killed by the system (OOM - Out of Memory).
 *   **Solution:**
-    1.  Check the logs: `docker compose logs api | grep ffmpeg`.
+    1.  Check the logs: `docker compose logs videocms | grep ffmpeg`.
     2.  If you see "Killed", your server ran out of RAM. Increase your server's RAM or add swap space.
     3.  If you see "Permission denied", check if the `./videos` folder is writable by the container user.
 
