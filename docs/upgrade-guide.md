@@ -10,14 +10,39 @@ description: How to safely upgrade VideoCMS to the latest version.
 
 VideoCMS is designed to be easily upgradable using Docker.
 
-## Versioning Strategy
+## Migrating from Alpha to Beta
 
-Currently, we recommend tracking the `:alpha` tag for the latest features and fixes.
+**Important:** The Beta release introduces a significant architectural simplification. The separate frontend container (`panel`) has been merged into the main backend container (`api`), now simply called `videocms`.
+
+**Changes Required:**
+
+1.  **Update Image:** Change `kirari04/videocms:alpha` to `kirari04/videocms:beta`.
+2.  **Remove Panel Service:** Delete the `panel` service block from your `docker-compose.yaml`.
+3.  **Update Ports:** The new container listens on port `3000` (previously the API was on `8080`). Update your port mapping to `3000:3000`.
+4.  **Single Domain:** You no longer need separate domains for API and Panel. Everything is served from the same origin.
+
+**Example `docker-compose.yaml` (New):**
 
 ```yaml
 services:
-  api:
-    image: kirari04/videocms:alpha
+  videocms:
+    image: kirari04/videocms:beta
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./videos:/app/videos
+      - ./database:/app/database
+```
+
+## Versioning Strategy
+
+Currently, we recommend tracking the `:beta` tag for the latest features and fixes.
+
+```yaml
+services:
+  videocms:
+    image: kirari04/videocms:beta
     # ...
 ```
 
