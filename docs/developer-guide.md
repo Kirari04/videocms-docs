@@ -46,6 +46,11 @@ The backend is written in Go using the Echo framework and GORM (SQLite).
     ```
     The API will start at `http://localhost:3000`.
 
+    > **Note:** If you are running the frontend development server simultaneously (which also defaults to port 3000), you should run the backend on a different port:
+    > ```bash
+    > Host=:8080 make dev
+    > ```
+
 4.  **Run Manually:**
     ```bash
     go run main.go serve
