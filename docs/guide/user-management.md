@@ -6,7 +6,6 @@ description: Managing users, creating accounts, and resetting passwords.
 
 # User Management
 
-[[toc]]
 
 This guide covers how to manage users in VideoCMS, including creating new accounts and resetting passwords.
 
