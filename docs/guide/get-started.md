@@ -1,18 +1,36 @@
 ---
 lang: en-US
 title: Get Started
-description: Getting started with VideoCMS
+description: Getting started with VideoCMS locally
 ---
 
 # Get Started
 
 [[toc]]
 
+This guide will help you set up VideoCMS on your local machine for testing and development.
+
+> **Production Setup:** If you are deploying to a public server with a domain name and SSL, please check our [Production Deployment Cookbook](../cookbooks/production-deployment.md).
+
+## System Requirements
+
+VideoCMS is designed to be lightweight, but video encoding is resource-intensive.
+
+-   **RAM:**
+    -   **Panel (Frontend):** Uses ~128MB RAM (Bun runtime).
+    -   **API (Backend):** Uses minimal RAM (<50MB) when idle.
+    -   **Encoding:** This is the main consumer. Each concurrent ffmpeg process can use significant RAM depending on the video resolution.
+    -   **Minimum Recommendation:** 2GB RAM (for 1 concurrent encode).
+    -   **Recommended:** 4GB+ RAM (for multiple concurrent encodes).
+
+-   **CPU:**
+    -   Encoding is CPU-bound. More cores = faster processing.
+    -   **Minimum:** 2 vCPUs.
+    -   **Recommended:** 4+ vCPUs for a smooth experience.
+
 ## Prerequisites
 
-- A server with Docker and Docker Compose installed.
-- A registered domain name.
-- Point the domains `player.example.com` and `api-player.example.com` to the public IP address of your server.
+- Docker and Docker Compose installed on your machine.
 
 ## Setup
 
@@ -25,17 +43,39 @@ description: Getting started with VideoCMS
 
 2.  **Create a `docker-compose.yaml` file:**
 
-    Create a file named `docker-compose.yaml` with the following content. This configuration uses Caddy to automatically handle HTTPS for your domains.
+    Create a file named `docker-compose.yaml` with the following content.
 
-    @[code yaml title="docker-compose.yaml"](../../docker-compose.yaml)
+    ```yaml
+    services:
+      api:
+        image: kirari04/videocms:alpha
+        restart: unless-stopped
+        ports:
+          - "8080:8080"
+        networks:
+          - videocmsnet
+        volumes:
+          - ./videos:/app/videos
+          - ./database:/app/database
 
-3.  **Create a `Caddyfile`:**
+      panel:
+        image: kirari04/videocms:panel
+        restart: unless-stopped
+        ports:
+          - "3000:3000"
+        networks:
+          - videocmsnet
+        environment:
+          - NUXT_PUBLIC_API_URL=http://localhost:8080/api
+          - NUXT_PUBLIC_BASE_URL=http://localhost:8080
+          - NUXT_PUBLIC_NAME=VideoCMS
 
-    Create a file named `Caddyfile` and replace `player.example.com` and `api-player.example.com` with your actual domains.
+    networks:
+      videocmsnet:
+        driver: bridge
+    ```
 
-    @[code Caddyfile title="Caddyfile"](../../Caddyfile)
-
-4.  **Start the application:**
+3.  **Start the application:**
 
     Run the following command to start all services.
 
@@ -47,29 +87,26 @@ description: Getting started with VideoCMS
 
 On the first startup, a default user with the username `admin` and the password `12345678` is created.
 
-You can now open the panel on `https://player.example.com/login` and login using the default credentials.
+1.  Open your browser and navigate to `http://localhost:3000/login`.
+2.  Login with the default credentials:
+    -   Username: `admin`
+    -   Password: `12345678`
 
-Next, navigate to the Config Page at `https://player.example.com/my/config`.
+3.  Navigate to the Config Page at `http://localhost:3000/my/config`.
 
-Replace the Value of `BaseUrl` with the URL of your API, which is `https://api-player.example.com`.
+4.  **Important:** Replace the Value of `BaseUrl` with `http://localhost:8080`.
 
-Make sure to save the changes using the **save button** at the bottom of the page.
+5.  Make sure to save the changes using the **save button** at the bottom of the page.
 
-After modifying the settings you should restart the containers.
+6.  Restart the containers to apply the configuration changes:
 
-```sh
-docker compose down
-docker compose up -d
-```
+    ```sh
+    docker compose down
+    docker compose up -d
+    ```
 
-## Start Sharing Videos
+## Next Steps
 
-You can now navigate to the Video Page at `https://player.example.com/my/videos` and start uploading your first clip by pressing **start upload**.
-
-![Upload Example](./assets/upload_example.png)
-
-After the upload has finished you can close the **Upload Manager** and press on the **refresh button**.
-
-The Video will show up in the list and if you click on it you get some more detailed informations.
-
-![Video Info Example](./assets/video_info_example.png)
+-   **Upload a Video:** Go to `http://localhost:3000/my/videos` to upload your first video.
+-   **Secure your Instance:** Read the [Security Cookbook](../cookbooks/security.md) to change default passwords and keys.
+-   **Deploy to Production:** Ready to go live? See [Production Deployment](../cookbooks/production-deployment.md).

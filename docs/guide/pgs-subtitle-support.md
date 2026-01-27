@@ -4,7 +4,7 @@ title: PGS Subtitle Support
 description: PGS Subtitle Support on VideoCMS
 ---
 
-# Encoding Quality Settings
+# PGS Subtitle Support
 
 [[toc]]
 
@@ -79,8 +79,6 @@ Now that the service is running, you need to tell VideoCMS how to communicate wi
 For clarity, here is a complete `docker-compose.yaml` file that includes the `pgsplugin` service.
 
 ```yaml
-version: "3.8"
-
 services:
   api:
     image: kirari04/videocms:alpha
@@ -127,3 +125,7 @@ networks:
 volumes:
   caddy_data: {}
 ```
+
+## See Also
+
+- [Configuration Reference](../configuration.md) - For more details on plugin configuration.

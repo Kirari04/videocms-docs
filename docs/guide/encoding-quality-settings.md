@@ -57,3 +57,7 @@ For a premium video service where visual quality is the top priority, you would 
 * **Increase bitrates:** You could increase the default bitrate values for a crisper image, especially for 1080p and higher resolutions.
 
 By carefully adjusting these settings, you can tailor the video streaming experience to the specific needs of your platform and audience.
+
+## See Also
+
+- [Configuration Reference](../configuration.md) - Full list of environment variables and settings.
