@@ -17,11 +17,10 @@ This guide will help you set up VideoCMS on your local machine for testing and d
 VideoCMS is designed to be lightweight, but video encoding is resource-intensive.
 
 -   **RAM:**
-    -   **Panel (Frontend):** Uses ~128MB RAM (Bun runtime).
-    -   **API (Backend):** Uses minimal RAM (<50MB) when idle.
+    -   **VideoCMS (All-in-One):** Uses ~50MB RAM when idle.
     -   **Encoding:** This is the main consumer. Each concurrent ffmpeg process can use significant RAM depending on the video resolution.
-    -   **Minimum Recommendation:** 2GB RAM (for 1 concurrent encode).
-    -   **Recommended:** 4GB+ RAM (for multiple concurrent encodes).
+    -   **Minimum Recommendation:** 4GB RAM (for 1 concurrent encode).
+    -   **Recommended:** 8GB+ RAM (for multiple concurrent encodes).
 
 -   **CPU:**
     -   Encoding is CPU-bound. More cores = faster processing.
@@ -47,37 +46,20 @@ VideoCMS is designed to be lightweight, but video encoding is resource-intensive
 
     ```yaml
     services:
-      api:
-        image: kirari04/videocms:alpha
+      videocms:
+        image: kirari04/videocms:beta
         restart: unless-stopped
         ports:
-          - "8080:8080"
-        networks:
-          - videocmsnet
+          - "3000:3000"
         volumes:
           - ./videos:/app/videos
           - ./database:/app/database
 
-      panel:
-        image: kirari04/videocms:panel
-        restart: unless-stopped
-        ports:
-          - "3000:3000"
-        networks:
-          - videocmsnet
-        environment:
-          - NUXT_PUBLIC_API_URL=http://localhost:8080/api
-          - NUXT_PUBLIC_BASE_URL=http://localhost:8080
-          - NUXT_PUBLIC_NAME=VideoCMS
-
-    networks:
-      videocmsnet:
-        driver: bridge
     ```
 
 3.  **Start the application:**
 
-    Run the following command to start all services.
+    Run the following command to start the service.
 
     ```sh
     docker compose up -d
@@ -94,11 +76,11 @@ On the first startup, a default user with the username `admin` and the password 
 
 3.  Navigate to the Config Page at `http://localhost:3000/my/config`.
 
-4.  **Important:** Replace the Value of `BaseUrl` with `http://localhost:8080`.
+4.  **Important:** Replace the Value of `BaseUrl` with `http://localhost:3000`.
 
 5.  Make sure to save the changes using the **save button** at the bottom of the page.
 
-6.  Restart the containers to apply the configuration changes:
+6.  Restart the container to apply the configuration changes:
 
     ```sh
     docker compose down
