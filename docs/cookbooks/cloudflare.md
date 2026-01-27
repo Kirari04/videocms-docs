@@ -14,9 +14,8 @@ Cloudflare provides excellent protection and performance benefits. Here is how t
 
 1.  Log in to your Cloudflare dashboard.
 2.  Go to **DNS**.
-3.  Create two `A` records (or `CNAME` records) for your domains:
-    -   `player.example.com` -> Your Server IP
-    -   `api-player.example.com` -> Your Server IP
+3.  Create an `A` record (or `CNAME` record) for your domain:
+    -   `video.example.com` -> Your Server IP
 4.  Ensure the **Proxy status** is set to **Proxied** (Orange Cloud).
 
 ## 2. SSL/TLS Settings
