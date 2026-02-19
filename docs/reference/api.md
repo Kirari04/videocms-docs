@@ -93,7 +93,8 @@ You can find the API key management tools at the following path:
 
 - `GET /files`: List files.
 - `GET /file`: Get file details.
-- `POST /file`: Create a file entry.
+- `POST /file`: Create a file entry (Parallel Chunked Upload finalization).
+- `POST /file/upload`: Direct single-request file upload.
 - `POST /file/clone`: Clone a file.
 - `PUT /file`: Update file details.
 - `DELETE /file`: Delete a file.

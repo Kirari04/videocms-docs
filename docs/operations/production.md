@@ -48,6 +48,10 @@ Replace `video.example.com` with your domain.
 
 ```caddyfile
 video.example.com {
+    # Higher body limit for direct uploads (e.g., 5GB)
+    request_body {
+        max_size 5G
+    }
     reverse_proxy videocms:3000
 }
 ```
@@ -64,6 +68,7 @@ server {
     listen 80;
     server_name video.example.com;
 
+    # Global limit (can be small)
     client_max_body_size 10M;
 
     location / {
@@ -74,8 +79,19 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # Parallel Chunked Uploads (chunks are usually small)
     location /api/pcu/chunck {
         client_max_body_size 100M;
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Direct Single-File Uploads (matches MaxUploadFilesize)
+    location /api/file/upload {
+        client_max_body_size 5G;
         proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

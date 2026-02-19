@@ -34,7 +34,17 @@ You need to tell VideoCMS to trust the headers sent by Cloudflare so that it cor
 
 ## 4. Increase Upload Limits
 
-Cloudflare's free plan has a limit on upload body sizes (100MB). VideoCMS uses chunked uploads to bypass this limitation for files, but you should ensure:
+Cloudflare's plan has limits on upload body sizes (e.g., 100MB on the **Free** plan). 
 
-1.  **Max Upload Chuncksize**: Set this to something smaller than 100MB (e.g., `50000000` for 50MB) in your VideoCMS config.
-2.  This ensures that large video files are split into small chunks that Cloudflare accepts.
+### PCU Upload (Recommended)
+VideoCMS uses **Parallel Chunked Upload (PCU)** to bypass this limitation for most dashboard uploads. 
+1. **Max Upload Chuncksize**: Set this to something smaller than 100MB (e.g., `50000000` for 50MB) in your VideoCMS config.
+2. This ensures that large video files are split into small chunks that Cloudflare accepts.
+
+### Direct API Upload (/api/file/upload)
+If you use the direct single-file upload route (`/api/file/upload`), you **MUST** be aware of Cloudflare's limits:
+- **Free Plan**: 100MB max per request.
+- **Pro/Business Plan**: Up to 500MB max.
+- **Enterprise Plan**: Custom limits.
+
+If your files exceed 100MB and you are on the Free plan, the direct upload via `/api/file/upload` will return a `413 Request Entity Too Large` error from Cloudflare. In this case, either use the chunked upload API or bypass the proxy for a dedicated upload subdomain (e.g., `uploads.example.com` with Gray Cloud/No Proxy).
