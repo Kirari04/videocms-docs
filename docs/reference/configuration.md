@@ -16,9 +16,6 @@ VideoCMS is configured using environment variables. This page lists all availabl
 | `Host` | The host and port the server listens on. | `:3000` |
 | `AppName` | The name of your application instance. | - |
 | `BaseUrl` | The base URL of the API (e.g., `https://api.example.com`). | - |
-| `Project` | The project name. | - |
-| `ProjectDocumentation` | URL to project documentation. | - |
-| `ProjectDownload` | URL to project download page. | - |
 | `ProjectExampleVideo` | UUID of an example video. | - |
 
 ## Security & Authentication
