@@ -12,14 +12,14 @@
   },
   "devDependencies": {
     "medium-zoom": "^1.1.0",
-    "mermaid": "^11.12.2",
-    "sass": "^1.97.3",
+    "mermaid": "^11.15.0",
+    "sass": "^1.100.0",
     "vitepress": "^1.6.4",
     "vitepress-plugin-mermaid": "^2.0.17",
     "vitepress-plugin-tabs": "^0.7.3",
-    "vue": "^3.5.27"
+    "vue": "^3.5.35"
   },
   "dependencies": {
-    "caniuse-lite": "^1.0.30001766"
+    "caniuse-lite": "^1.0.30001793"
   }
 }
