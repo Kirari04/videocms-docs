@@ -114,6 +114,22 @@ You can find the API key management tools at the following path:
 - `POST /pcu/chunck`: Upload a file chunk.
 - `POST /pcu/file`: Finalize an upload.
 
+### Remote Downloads
+
+Remote downloads are enabled by default globally and per user. They accept HTTP/HTTPS URLs only, block unsafe private/internal network targets, and use the normal video import validation after the file is downloaded.
+
+Statuses: `pending`, `downloading`, `importing`, `completed`, `failed`, `canceling`, `canceled`.
+
+- `POST /remote/download`: Create one or more remote download tasks.
+- `GET /remote/downloads`: List your remote downloads. Supports `status`, `limit`, and `offset`.
+- `POST /remote/download/:id/cancel`: Cancel a pending/running remote download.
+- `POST /remote/download/:id/retry`: Retry a failed/canceled remote download.
+- `DELETE /remote/download/:id`: Remove a completed/failed/canceled remote download row.
+- `DELETE /remote/downloads`: Clear terminal remote download rows by status.
+- `GET /account/remote-download`: Get remote download traffic stats.
+- `GET /account/remote-download/duration`: Get remote download duration stats.
+- `GET /account/remote-download/top`: Get top remote download stats.
+
 ### Account Stats
 
 - `GET /account`: Get account details.

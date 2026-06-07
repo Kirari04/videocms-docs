@@ -37,6 +37,7 @@ VideoCMS is configured using environment variables. This page lists all availabl
 | `EncodingEnabled` | Enable video encoding (true/false). | - |
 | `UploadEnabled` | Enable video uploads (true/false). | - |
 | `DownloadEnabled` | Enable video downloads (true/false). | - |
+| `RemoteDownloadEnabled` | Enable server-side remote downloads (true/false). Disabling cancels pending/running remote jobs. | `true` |
 | `PlayerV2Enabled` | Enable the V2 player (true/false). | - |
 | `ContinueWatchingPopupEnabled` | Enable "Continue Watching" popup (true/false). | - |
 | `ReloadHtml` | Enable HTML reloading (dev mode) (true/false). | - |
@@ -58,6 +59,8 @@ VideoCMS is configured using environment variables. This page lists all availabl
 | `RatelimitBurstWeb` | Web rate limit burst. | - |
 | `MaxItemsMultiDelete` | Max items for bulk deletion. | - |
 | `MaxRunningEncodes` | Max concurrent encoding jobs. | - |
+| `MaxParallelDownloads` | Max concurrent remote download jobs. | `1` |
+| `RemoteDownloadTimeout` | Max seconds for one remote download. | `3600` |
 | `MaxFramerate` | Max framerate for encoded videos. | - |
 | `MaxUploadFilesize` | Max upload file size (bytes). | - |
 | `MaxUploadChuncksize` | Max upload chunk size (bytes). | - |
