@@ -56,6 +56,8 @@ video.example.com {
 }
 ```
 
+VideoCMS handles player media authorization in Go using an HttpOnly cookie, so Caddy does not need any special signed URL or internal redirect configuration.
+
 == Nginx
 <div id="option-2-nginx"></div>
 
@@ -100,6 +102,8 @@ server {
     }
 }
 ```
+
+VideoCMS handles player media authorization in Go using an HttpOnly cookie, so Nginx does not need any special signed URL or internal redirect configuration.
 :::
 
 ## SSL Certificates
@@ -108,6 +112,10 @@ If you are not using Caddy (which handles SSL automatically) or Cloudflare, you 
 
 1.  **Certbot:** Use `certbot` on your host machine to generate certificates for your domains.
 2.  **Mount Certificates:** Mount the certificate files into your Nginx container and update the Nginx config to listen on port 443 and use the certificates.
+
+Player embeds on other websites require HTTPS. Browsers only send cross-site player media cookies when they are marked `SameSite=None; Secure`, and the `Secure` attribute requires HTTPS.
+
+Direct media file URLs are not standalone access links. Open or embed `/v/:UUID` first so VideoCMS can issue the short-lived media cookie for that video.
 
 ---
 
@@ -118,7 +126,7 @@ Deploying the containers is only the first step. You **must** perform these acti
 ### 1. Change Secret Keys
 By default, the application might use insecure or placeholder keys for signing session tokens.
 - Navigate to **Settings** (`/my/config`).
-- Change `JwtSecretKey` and `JwtUploadSecretKey` to long, random strings.
+- Change `JwtSecretKey`, `JwtUploadSecretKey`, and `JwtMediaSecretKey` to long, random strings.
 - **Restart the containers** after saving.
 
 ### 2. Trust Reverse Proxy (IP Identification)
@@ -133,4 +141,3 @@ The default admin credentials (`admin` / `12345678`) are public knowledge. Chang
 ---
 
 For a comprehensive list of security measures, including firewall configuration and secret key management, please refer to the [Post-Installation Security](./security.md) guide.
-

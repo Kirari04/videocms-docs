@@ -40,9 +40,11 @@ These routes are primarily used by the video player and public interfaces.
 - `GET /:UUID/:SUBUUID/subtitle/:FILE`: Get subtitle file.
 - `GET /:UUID/:AUDIOUUID/stream/master.m3u8`: Get audio stream.
 - `GET /:UUID/:QUALITY/download/video.mkv`: Download video.
-- `GET /:UUID/:QUALITY/:JWT/:STREAM/stream/video.mp4`: Stream video file directly.
+- `GET /:UUID/:QUALITY/:STREAM/stream/video.mp4`: Stream video file directly.
 - `GET /:UUID/:QUALITY/:FILE`: Get video segment/file.
 - `GET /:UUID/:AUDIOUUID/audio/:FILE`: Get audio segment/file.
+
+Except for thumbnails, media routes require the `vc_media` HttpOnly cookie that is set by visiting the player page at `/v/:UUID`. Stream tokens are no longer passed in query strings.
 
 ## Authentication API
 

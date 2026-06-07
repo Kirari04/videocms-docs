@@ -85,7 +85,7 @@ You won't find a `master.m3u8` file on the disk. VideoCMS generates the Master P
 This allows the server to:
 1.  Instantly enable/disable specific qualities without re-writing files.
 2.  Serve different audio tracks based on user language preferences.
-3.  Inject authentication tokens (`?jwt=...`) into the stream URLs for security.
+3.  Keep media URLs tokenless while the Go server verifies the HttpOnly media cookie set by the player page.
 
 ## Database Flow
 

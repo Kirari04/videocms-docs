@@ -24,6 +24,7 @@ VideoCMS is configured using environment variables. This page lists all availabl
 | :--- | :--- | :--- |
 | `JwtSecretKey` | Secret key for JWT authentication. **Change this!** | - |
 | `JwtUploadSecretKey` | Secret key for upload sessions. **Change this!** | - |
+| `JwtMediaSecretKey` | Secret key for player media cookies. Rotating it invalidates active playback cookies. | - |
 | `TrustedProxies` | Comma-separated list of trusted proxy IPs. | - |
 | `TrustLocalTraffic` | Whether to trust local traffic (true/false). | - |
 | `CorsAllowOrigins` | Allowed CORS origins. | - |
