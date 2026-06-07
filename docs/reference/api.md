@@ -95,7 +95,7 @@ You can find the API key management tools at the following path:
 
 - `GET /files`: List files.
 - `GET /file`: Get file details.
-- `POST /file`: Create a file entry (Parallel Chunked Upload finalization).
+- `POST /file`: Create a file entry.
 - `POST /file/upload`: Direct single-request file upload.
 - `POST /file/clone`: Clone a file.
 - `PUT /file`: Update file details.
@@ -108,13 +108,17 @@ You can find the API key management tools at the following path:
 - `POST /file/tag`: Add a tag to a file.
 - `DELETE /file/tag`: Remove a tag from a file.
 
-### Uploads (PCU)
+### Uploads (tus)
 
-- `GET /pcu/sessions`: List upload sessions.
-- `POST /pcu/session`: Create an upload session.
-- `DELETE /pcu/session`: Delete an upload session.
-- `POST /pcu/chunck`: Upload a file chunk.
-- `POST /pcu/file`: Finalize an upload.
+VideoCMS embeds a tus resumable upload endpoint. All tus requests except `OPTIONS` require the normal `Authorization: Bearer <token>` header.
+
+- `OPTIONS /uploads`: Discover tus protocol support.
+- `POST /uploads`: Create a tus upload. Metadata should include `filename`; dashboard uploads also send `client_upload_uuid` and optional `parent_folder_id`.
+- `HEAD /uploads/:upload_id`: Read current upload offset.
+- `PATCH /uploads/:upload_id`: Upload bytes using `Content-Type: application/offset+octet-stream`.
+- `DELETE /uploads/:upload_id`: Cancel and remove an unfinished upload.
+- `GET /uploads/sessions`: List active resumable upload sessions.
+- `POST /uploads/:upload_id/finalize`: Import a completed tus upload into VideoCMS and return the created link.
 
 ### Remote Downloads
 

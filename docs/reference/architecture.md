@@ -27,11 +27,11 @@ graph TD
 VideoCMS uses a prioritized queue system to handle video processing. This ensures that essential components (like audio and subtitles) are ready before the heavy video encoding begins.
 
 ### 1. Upload & Assembly
-1.  **Chunked Upload:** The frontend splits the file into chunks (default 20MB) and uploads them sequentially to `./videos/uploads/{session_id}/`.
-2.  **Assembly:** Once all chunks are received, they are concatenated into a single file (`example.mkv`).
+1.  **Resumable Upload:** The frontend uploads through the embedded tus endpoint at `/api/uploads`. Browser refreshes and network interruptions can resume within the upload retention window.
+2.  **Finalize:** After tus reports completion, VideoCMS finalizes the upload and moves the completed raw file from `./videos/uploads/tus/` to `./videos/uploads/{uuid}.tmp`.
 3.  **Validation:** `ffprobe` checks the file for valid video streams, resolution (50px - 8000px), and duration.
 4.  **Hashing:** A SHA256 hash is generated to detect duplicate files. If a duplicate is found, the new upload acts as a "symlink" to the existing file (Database-level cloning), saving storage space.
-5.  **Final Move:** The valid file is renamed to `./videos/uploads/{uuid}.tmp` and registered in the database.
+5.  **Registration:** The valid file is registered in the database and queued for media processing.
 
 ### 2. The Worker Loop
 The backend runs a background service (`services/Encoder.go`) that wakes up every 10 seconds to look for pending tasks. It processes them in this specific order:
@@ -61,8 +61,8 @@ This is the main storage volume. You should **never** manually delete files here
 ```text
 ./videos/
 ├── uploads/                  # Temporary staging area for raw uploads
-│   ├── {session_uuid}/       # Active upload session chunks
-│   └── {file_uuid}.tmp       # The assembled raw video (Temporary)
+│   ├── tus/                  # Active tus upload resources and metadata
+│   └── {file_uuid}.tmp       # Finalized raw video before/while import
 │
 └── qualitys/                 # Permanent storage for processed media
     └── {video_uuid}/         # The processed video folder (HLS assets)

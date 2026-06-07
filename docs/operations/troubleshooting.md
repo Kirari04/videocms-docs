@@ -23,8 +23,8 @@ docker compose logs -f videocms
 ### Upload stuck at 0% or "Network Error"
 *   **Cause:** Your reverse proxy (Nginx/Cloudflare) might be blocking the request body.
 *   **Solution:**
-    *   **Nginx:** Ensure `client_max_body_size` is larger than your **Chunk Size** (default 20MB). We recommend setting it to `50M` or higher.
-    *   **Cloudflare:** Free accounts limit upload bodies to 100MB. Ensure your `MaxUploadChuncksize` in the VideoCMS config is set to `50000000` (50MB) or less.
+    *   **Nginx:** Ensure `client_max_body_size` is larger than your **Max Upload Chunk Size** (default 20MB). We recommend setting it to `50M` or higher.
+    *   **Cloudflare:** Free accounts limit upload bodies to 100MB. Ensure your `MaxUploadChunkSize` in the VideoCMS config is set to `50000000` (50MB) or less.
 *   **Cause:** CORS issues if `BaseUrl` is not set correctly.
 *   **Solution:** Check your browser's dev tools (Console/Network tab). If you see CORS errors, ensure the admin panel `BaseUrl` matches your public domain.
 
@@ -32,7 +32,16 @@ docker compose logs -f videocms
 *   **Cause:** Too many users are uploading at once, or you have "ghost" sessions from failed uploads.
 *   **Solution:**
     1.  Increase `MaxUploadSessions` in the Admin Config.
-    2.  Wait for the automatic cleanup (sessions expire after 2 hours).
+    2.  Wait for the automatic cleanup (resumable upload sessions expire after 24 hours).
+
+### tus PATCH logs mention `NetworkTimeoutError` or `ERR_UNEXPECTED_EOF`
+*   **`NetworkTimeoutError ... feature not supported`:** A Go response-writer wrapper is hiding `http.ResponseController` from tusd. VideoCMS' built-in tus wrapper forwards this correctly; if you add custom Go middleware around `/api/uploads`, make sure the wrapper implements `Unwrap() http.ResponseWriter`.
+*   **`ERR_UNEXPECTED_EOF`:** A PATCH request ended before the current chunk finished. This is normally caused by a paused upload, browser reload, network interruption, or a proxy closing the request. The browser uploader retries and resumes from the server offset.
+*   **If it repeats constantly:** Check that your reverse proxy allows tus `POST`, `HEAD`, `PATCH`, `DELETE`, and `OPTIONS`, and that its request body limit is at least `MaxUploadChunkSize`.
+
+### Upload fails at the end with `413`
+*   **Cause:** With parallel tus uploads, the last request concatenates the partial uploads into one final upload. If the full file is larger than `MaxUploadFilesize`, tus rejects that final request with `ERR_MAX_SIZE_EXCEEDED`.
+*   **Solution:** Raise `MaxUploadFilesize` in the admin config or upload a smaller file. If the failure happens during chunk transfer instead of at the end, check `MaxUploadChunkSize` and your reverse proxy body limit.
 
 ## Encoding / FFmpeg Issues
 
@@ -109,4 +118,3 @@ If the server runs out of RAM, it will start "swapping" to the disk, which is ex
     ```bash
     free -m
     ```
-

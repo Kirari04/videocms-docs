@@ -81,8 +81,8 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Parallel Chunked Uploads (chunks are usually small)
-    location /api/pcu/chunck {
+    # Resumable tus uploads. Match this to MaxUploadChunkSize.
+    location /api/uploads {
         client_max_body_size 100M;
         proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
@@ -106,6 +106,12 @@ server {
 VideoCMS handles player media authorization in Go using an HttpOnly cookie, so Nginx does not need any special signed URL or internal redirect configuration.
 :::
 
+## Resumable Upload Proxy Requirements
+
+VideoCMS implements tus uploads inside the Go API. Reverse proxies do not need custom upload routing, but they must pass the tus methods `POST`, `HEAD`, `PATCH`, `DELETE`, and `OPTIONS` to `/api/uploads`.
+
+Set the proxy body limit for `/api/uploads` to at least `MaxUploadChunkSize`, not the full maximum file size. If uploads repeatedly fail with `ERR_UNEXPECTED_EOF`, the most common causes are a proxy closing the PATCH body early, browser/network interruption, or a chunk size larger than the proxy allows.
+
 ## SSL Certificates
 
 If you are not using Caddy (which handles SSL automatically) or Cloudflare, you must secure your instance with SSL.
@@ -126,7 +132,7 @@ Deploying the containers is only the first step. You **must** perform these acti
 ### 1. Change Secret Keys
 By default, the application might use insecure or placeholder keys for signing session tokens.
 - Navigate to **Settings** (`/my/config`).
-- Change `JwtSecretKey`, `JwtUploadSecretKey`, and `JwtMediaSecretKey` to long, random strings.
+- Change `JwtSecretKey` and `JwtMediaSecretKey` to long, random strings.
 - **Restart the containers** after saving.
 
 ### 2. Trust Reverse Proxy (IP Identification)

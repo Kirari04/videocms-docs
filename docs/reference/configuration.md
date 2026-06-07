@@ -23,7 +23,6 @@ VideoCMS is configured using environment variables. This page lists all availabl
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `JwtSecretKey` | Secret key for JWT authentication. **Change this!** | - |
-| `JwtUploadSecretKey` | Secret key for upload sessions. **Change this!** | - |
 | `JwtMediaSecretKey` | Secret key for player media cookies. Rotating it invalidates active playback cookies. | - |
 | `TrustedProxies` | Comma-separated list of trusted proxy IPs. | - |
 | `TrustLocalTraffic` | Whether to trust local traffic (true/false). | - |
@@ -64,7 +63,7 @@ VideoCMS is configured using environment variables. This page lists all availabl
 | `RemoteDownloadTimeout` | Max seconds for one remote download. | `3600` |
 | `MaxFramerate` | Max framerate for encoded videos. | - |
 | `MaxUploadFilesize` | Max upload file size (bytes). | - |
-| `MaxUploadChuncksize` | Max upload chunk size (bytes). | - |
+| `MaxUploadChunkSize` | Max tus PATCH request body size (bytes). Keep this below reverse-proxy upload body limits. | - |
 | `MaxUploadSessions` | Max active upload sessions. | - |
 | `MaxPostSize` | Max HTTP POST body size. | - |
 

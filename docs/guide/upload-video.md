@@ -54,7 +54,7 @@ curl -X POST https://video.example.com/api/file/upload \
 
 ### Key Considerations
 - **Body Limits**: Ensure your reverse proxy (Nginx/Caddy) is configured to handle the file size (see [Production Deployment](../operations/production.md)).
-- **Reliability**: For extremely large files (several GBs) or unstable connections, the dashboard's **Parallel Chunked Upload (PCU)** is still recommended as it supports resuming.
+- **Reliability**: For extremely large files (several GBs) or unstable connections, the dashboard's tus resumable uploader is recommended because interrupted uploads can resume.
 - **API Keys**: Manage your keys in **Settings > API Management**.
 
 ::: tip More Info

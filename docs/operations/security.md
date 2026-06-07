@@ -20,14 +20,13 @@ The default admin account is created with known credentials.
 
 ## 2. Update Secret Keys
 
-The application uses JWT tokens for session management, upload sessions, and media playback cookies. You **must** change the secret keys to prevent attackers from forging sessions or media access.
+The application uses JWT tokens for session management and media playback cookies. You **must** change the secret keys to prevent attackers from forging sessions or media access.
 
 1.  Go to the **Config** page (`/my/config`).
 2.  Find **JwtSecretKey**. Generate a long, random string and paste it here.
-3.  Find **JwtUploadSecretKey**. Generate another long, random string and paste it here.
-4.  Find **JwtMediaSecretKey**. Generate another long, random string and paste it here.
-5.  **Save** the configuration.
-6.  **Restart** the application containers for the changes to take effect.
+3.  Find **JwtMediaSecretKey**. Generate another long, random string and paste it here.
+4.  **Save** the configuration.
+5.  **Restart** the application containers for the changes to take effect.
 
 ## 3. Disable Debug/Dev Modes
 
