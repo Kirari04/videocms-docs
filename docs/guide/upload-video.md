@@ -19,12 +19,9 @@ Before uploading, ensure you are in the correct **Target Folder**. The breadcrum
 
 ## Upload Configuration
 
-The Upload Manager allows you to fine-tune how files are sent to the server:
+Dashboard uploads use adaptive chunk concurrency automatically. VideoCMS starts conservatively, measures accepted upload throughput, increases concurrency when it helps, and backs off if the browser connection stalls or chunks need retries.
 
--   **Concurrent Chunks**: VideoCMS uploads files in small parts (chunks). This setting controls how many chunks are uploaded simultaneously.
-    -   **1 Chunk (Stable)**: Best for slow or unstable internet connections.
-    -   **4 Chunks (Recommended)**: The default balance between speed and reliability.
-    -   **10-15 Chunks (Fast/Ultra)**: Use this if you have a high-speed connection and want to maximize throughput.
+The server setting `MaxUploadChunkSize` still controls the maximum tus PATCH request body size. Your reverse proxy limit for `/api/uploads` must be at least that value.
 
 ## Managing the Upload Queue
 

@@ -37,14 +37,14 @@ docker compose logs -f videocms
 ### tus PATCH logs mention `NetworkTimeoutError` or `ERR_UNEXPECTED_EOF`
 *   **`NetworkTimeoutError ... feature not supported`:** A Go response-writer wrapper is hiding `http.ResponseController` from tusd. VideoCMS' built-in tus wrapper forwards this correctly; if you add custom Go middleware around `/api/uploads`, make sure the wrapper implements `Unwrap() http.ResponseWriter`.
 *   **`ERR_UNEXPECTED_EOF`:** A PATCH request ended before the current chunk finished. This is normally caused by a paused upload, browser reload, network interruption, or a proxy closing the request. The browser uploader retries and resumes from the server offset.
-*   **If it repeats constantly:** Check that your reverse proxy allows tus `POST`, `HEAD`, `PATCH`, `DELETE`, and `OPTIONS`, and that its request body limit is at least `MaxUploadChunkSize`.
+*   **If it repeats constantly:** Check that your reverse proxy allows tus `POST`, `HEAD`, `PATCH`, `DELETE`, and `OPTIONS`, and that its request body limit is at least `MaxUploadChunkSize`. Adaptive upload concurrency can reduce pressure on unstable connections, but it cannot fix a proxy body-size mismatch.
 
 ### Upload request is blocked as mixed content
 *   **Cause:** The browser page is HTTPS, but an old or incorrect tus upload URL is HTTP.
 *   **Solution:** Set `BaseUrl` to the public HTTPS URL of your VideoCMS instance. Ensure your reverse proxy forwards the original `Host` header and `X-Forwarded-Proto`. In the browser Network tab, inspect the first `POST /api/uploads` response and confirm its `Location` header starts with `https://`.
 
 ### Upload fails at the end with `413`
-*   **Cause:** With parallel tus uploads, the last request concatenates the partial uploads into one final upload. If the full file is larger than `MaxUploadFilesize`, tus rejects that final request with `ERR_MAX_SIZE_EXCEEDED`.
+*   **Cause:** Adaptive dashboard uploads may concatenate completed partial uploads into one final tus upload. If the full file is larger than `MaxUploadFilesize`, tus rejects that final request with `ERR_MAX_SIZE_EXCEEDED`.
 *   **Solution:** Raise `MaxUploadFilesize` in the admin config or upload a smaller file. If the failure happens during chunk transfer instead of at the end, check `MaxUploadChunkSize` and your reverse proxy body limit.
 
 ## Encoding / FFmpeg Issues

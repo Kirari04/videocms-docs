@@ -112,6 +112,8 @@ VideoCMS implements tus uploads inside the Go API. Reverse proxies do not need c
 
 Set the proxy body limit for `/api/uploads` to at least `MaxUploadChunkSize`, not the full maximum file size. If uploads repeatedly fail with `ERR_UNEXPECTED_EOF`, the most common causes are a proxy closing the PATCH body early, browser/network interruption, or a chunk size larger than the proxy allows.
 
+The dashboard uploader chooses chunk concurrency automatically per active upload. This adaptive mode changes how many PATCH requests are active at once, but each PATCH body is still bounded by `MaxUploadChunkSize`.
+
 Set `BaseUrl` to the public URL users open in the browser, including `https://` in production. The reverse proxy should pass the original `Host` and `X-Forwarded-Proto` headers as shown above. VideoCMS normalizes tus upload `Location` headers before returning them, but correct `BaseUrl` and proxy headers keep browser resume URLs and diagnostics consistent.
 
 ## SSL Certificates
