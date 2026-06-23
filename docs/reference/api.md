@@ -36,7 +36,7 @@ These routes are primarily used by the video player and public interfaces.
 - `GET /v/:UUID`: Player page for a video.
 - `GET /:UUID/stream/muted/master.m3u8`: Get muted master playlist.
 - `GET /:UUID/stream/multi/master.m3u8`: Get multi-quality master playlist.
-- `GET /:UUID/image/thumb/:FILE`: Get video thumbnail.
+- `GET /:UUID/image/thumb/:FILE`: Get the current link's custom poster or generated fallback thumbnail.
 - `GET /:UUID/:SUBUUID/subtitle/:FILE`: Get subtitle file.
 - `GET /:UUID/:AUDIOUUID/stream/master.m3u8`: Get audio stream.
 - `GET /:UUID/:QUALITY/download/video.mkv`: Download video.
@@ -99,6 +99,8 @@ You can find the API key management tools at the following path:
 - `POST /file/upload`: Direct single-request file upload.
 - `POST /file/clone`: Clone a file.
 - `PUT /file`: Update file details.
+- `PUT /file/thumbnail`: Upload a JPEG, PNG, or WebP custom poster for one link. Requires multipart form fields `LinkID` and `thumbnail`.
+- `DELETE /file/thumbnail`: Reset one link's custom poster and fall back to the generated thumbnail. Requires `LinkID`.
 - `DELETE /file`: Delete a file.
 - `DELETE /files`: Bulk delete files.
 - `GET /files/search`: Search for files.
