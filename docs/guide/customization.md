@@ -29,8 +29,12 @@ Each webpage has several key configuration options:
 VideoCMS integrates a visual editor (GrapesJS) to help you design your pages without writing HTML manually. You can:
 
 - Build layouts using a drag-and-drop interface.
+- Start from practical templates such as imprint, privacy policy, terms, about, contact, and FAQ pages.
+- Use reusable layout, content, and component blocks for cards, callouts, FAQ groups, tables, contact details, and legal text.
 - Style elements directly within the editor.
-- Preview your changes before saving.
+- Preview your changes with the same VideoCMS theme colors used by the public page.
+
+The page builder uses VideoCMS-specific block classes, so newly created pages render consistently on public `/p/...` routes without depending on external Tailwind or DaisyUI CDN styles.
 
 ## Typical Use Cases
 
