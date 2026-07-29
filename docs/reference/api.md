@@ -60,8 +60,8 @@ Base URL: `/api`
 
 - `GET /config`: Get public configuration.
 - `GET /file/example`: Get an example file.
-- `GET /p/pages`: List public web pages.
-- `GET /p/page`: Get a specific public web page.
+- `GET /p/pages`: List published static pages.
+- `GET /p/page`: Get sanitized rendered content for a published static page. Hidden pages return `404`.
 
 ## Private API (Authenticated)
 
@@ -190,10 +190,12 @@ Base URL: `/api`
 
 - `GET /settings`: Get system settings.
 - `PUT /settings`: Update system settings.
-- `GET /pages`: List all web pages.
-- `POST /page`: Create a web page.
-- `PUT /page`: Update a web page.
-- `DELETE /page`: Delete a web page.
+- `GET /pages`: List all static pages, including hidden pages.
+- `GET /page/:id`: Get a static page for editing.
+- `POST /page`: Create a Markdown or HTML static page.
+- `POST /page/preview`: Render and sanitize a Markdown or HTML preview.
+- `PUT /page`: Update content, settings, or publication state.
+- `DELETE /page`: Delete a static page.
 
 ### Admin Encodings
 
