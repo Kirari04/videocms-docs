@@ -39,12 +39,32 @@ These routes are primarily used by the video player and public interfaces.
 - `GET /:UUID/image/thumb/:FILE`: Get the current link's custom poster or generated fallback thumbnail.
 - `GET /:UUID/:SUBUUID/subtitle/:FILE`: Get subtitle file.
 - `GET /:UUID/:AUDIOUUID/stream/master.m3u8`: Get audio stream.
-- `GET /:UUID/:QUALITY/download/video.mkv`: Download video.
 - `GET /:UUID/:QUALITY/:STREAM/stream/video.mp4`: Stream video file directly.
 - `GET /:UUID/:QUALITY/:FILE`: Get video segment/file.
 - `GET /:UUID/:AUDIOUUID/audio/:FILE`: Get audio segment/file.
 
 Except for thumbnails, media routes require the `vc_media` HttpOnly cookie that is set by visiting the player page at `/v/:UUID`. Stream tokens are no longer passed in query strings.
+
+### Prepared Downloads
+
+Downloads use persistent preparation jobs so reverse proxies do not have to keep an idle request open while FFmpeg packages the selected tracks. These routes live below the configured `FolderVideoQualitysPub` media prefix and require the same `vc_media` cookie as streaming.
+
+- `POST /:UUID/download-jobs`: Create or reuse a preparation job. Returns `202` while queued/preparing and `200` when an identical ready artifact is reused.
+- `GET /:UUID/download-jobs/:JOBUUID`: Read status, progress, queue position, estimated time, manifest, and ready-file metadata.
+- `GET /:UUID/download-jobs/:JOBUUID/file`: Transfer a ready artifact. Supports HTTP Range requests until the job expires.
+
+Creation body:
+
+```json
+{
+  "quality": "720p",
+  "container": "mkv",
+  "audioUUIDs": ["audio-uuid"],
+  "subtitleUUIDs": ["subtitle-uuid"]
+}
+```
+
+Statuses are `queued`, `preparing`, `ready`, `failed`, `canceled`, and `expired`. The prior synchronous `/:UUID/:QUALITY/download/:FILE` attachment route has been removed; the progressive MP4 player route is unchanged.
 
 ## Authentication API
 
@@ -143,7 +163,7 @@ Statuses: `pending`, `downloading`, `importing`, `completed`, `failed`, `canceli
 - `GET /account`: Get account details.
 - `GET /account/settings`: Get user settings.
 - `PUT /account/settings`: Update user settings.
-- `GET /account/traffic`: Get traffic statistics.
+- `GET /account/traffic`: Get combined delivery traffic plus `PlayerTraffic` and `DownloadTraffic` source series.
 - `GET /account/traffic/top`: Get top traffic statistics.
 - `GET /account/upload`: Get upload statistics.
 - `GET /account/upload/top`: Get top upload statistics.
@@ -169,7 +189,7 @@ Base URL: `/api`
 ### System Stats
 
 - `GET /stats`: Get system statistics.
-- `GET /stats/traffic`: Get global traffic stats.
+- `GET /stats/traffic`: Get global combined delivery traffic plus player/download source series.
 - `GET /stats/traffic/top`: Get global top traffic stats.
 - `GET /stats/upload`: Get global upload stats.
 - `GET /stats/upload/top`: Get global top upload stats.

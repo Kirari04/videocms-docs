@@ -72,6 +72,13 @@ VideoCMS is currently in its **Beta** phase.
 
 ## Recent Updates
 
+### Unreleased
+
+- Added persistent, deduplicated public download preparation jobs with queue position, FFmpeg progress, best-effort ETA, restart recovery, six-hour artifact retention, and Range delivery.
+- Split delivery statistics into player and prepared-file download traffic while preserving combined totals.
+- Added admin limits for preparation concurrency, queue size, and artifact retention.
+- Removed the synchronous attachment endpoint; progressive MP4 playback is unchanged.
+
 The following are the latest changes across the core and frontend repositories:
 
 <div v-if="loadingCommits">

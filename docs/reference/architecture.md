@@ -51,6 +51,19 @@ The backend runs a background service (`services/Encoder.go`) that wakes up ever
     *   Uses **HLS (HTTP Live Streaming)** with `libx264`.
     *   **Settings:** 4-second segments, Closed GOP, YUV420p.
 
+## Download Preparation Queue
+
+Public downloads are prepared by a separate persistent worker rather than inside the attachment request:
+
+1. The download page posts its quality/container/track manifest and immediately receives a job UUID.
+2. SQLite stores the FIFO queue. Identical active or unexpired ready manifests reuse the same job and artifact.
+3. A separately limited FFmpeg worker packages HLS video, audio, and subtitle inputs with stream copy (`-c copy`) while persisting progress.
+4. The page polls lightweight status responses. Reloading a URL containing `?job=<uuid>` resumes the same view.
+5. A completed artifact is atomically moved into `./videos/uploads/download-jobs/` and served with Range support.
+6. Cleanup expires artifacts after the configured retention period, removes stale partial/orphan files, and recovers interrupted jobs after restart.
+
+Preparation reads are internal filesystem work and do not count as delivery traffic. Actual response bytes are logged as `download`; HLS/player bytes are logged as `player`. The stats API retains the combined total and adds both source series.
+
 ## Storage Structure
 
 VideoCMS uses a flat-folder structure where the **Video UUID** is the root folder for that asset.
@@ -62,6 +75,7 @@ This is the main storage volume. You should **never** manually delete files here
 ./videos/
 ├── uploads/                  # Temporary staging area for raw uploads
 │   ├── tus/                  # Active tus upload resources and metadata
+│   ├── download-jobs/        # Expiring prepared download artifacts
 │   └── {file_uuid}.tmp       # Finalized raw video before/while import
 │
 └── qualitys/                 # Permanent storage for processed media
@@ -94,6 +108,8 @@ VideoCMS uses **SQLite** in WAL (Write-Ahead Logging) mode.
 *   **`files` table:** Stores metadata about the physical file (Hash, Path, Duration).
 *   **`links` table:** Represents the "User's View" of a file. Multiple users can have different `links` pointing to the same `file` (Deduplication).
 *   **`qualities`, `audios`, `subtitles`:** Store the status (`Ready`, `Encoding`, `Failed`) of each asset.
+*   **`download_jobs`:** Stores public download manifests, queue/progress state, output metadata, and expiry.
+*   **`traffic_logs`:** Stores delivered bytes classified as `player` or `download`.
 
 ## Scaling Implications
 

@@ -45,4 +45,8 @@ docker compose up -d
 
 VideoCMS automatically checks and updates the database schema every time it starts up using GORM's `AutoMigrate` feature.
 
+The persistent download-jobs release automatically creates `download_jobs` and adds a traffic source column. Existing traffic is classified as player traffic because historical attachment downloads cannot be separated retroactively.
+
+The old synchronous `/:UUID/:QUALITY/download/:FILE` attachment endpoint has been removed. Integrations must use the create/status/file download-job flow documented in the [API reference](../reference/api.md). The progressive MP4 player endpoint is unchanged.
+
 If a major breaking change ever requires manual intervention, it will be prominently listed in the [Changelog](../development/changelog.md).
