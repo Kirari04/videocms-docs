@@ -1,51 +1,43 @@
 ---
 lang: en-US
-title: Custom Webpages
-description: How to create and manage custom static pages on VideoCMS
+title: Static Pages
+description: How to publish supporting Markdown or HTML pages in VideoCMS
 ---
 
-# Custom Webpages
+# Static Pages
 
-VideoCMS allows you to create and manage custom static pages directly from your dashboard. This feature is primarily designed for essential pages such as legal notices, privacy policies, and terms of service.
+VideoCMS can publish supporting content such as a legal notice, privacy policy, terms, or an about page. Static pages use the standard VideoCMS layout and are not intended to replace a website or content-management system.
 
-## Managing Webpages
+## Managing Pages
 
-To manage your custom pages, navigate to **Web Pages** in your user dashboard. From there, you can:
+Admins can open **Static pages** in the dashboard to create, edit, hide, or delete a page.
 
-- **Create New Pages**: Click the "New Webpage" button to start building a new page.
-- **Edit Existing Pages**: Click the edit icon on any page in the list to modify its content, path, or settings.
-- **Delete Pages**: Remove pages that are no longer needed.
+Each page has these settings:
 
-## Configuration Options
+- **Title**: Shown above the page content.
+- **Public path**: The address below `/p/`. A path of `privacy` is available at `/p/privacy/`.
+- **Published**: Hidden pages remain editable but return `404` publicly.
+- **Footer link**: Adds the page to footer navigation while it is published.
+- **Content format**: Markdown or advanced HTML.
 
-Each webpage has several key configuration options:
+## Markdown
 
-- **Page Title**: The internal and public-facing title of the page.
-- **Public Path**: The URL segment where the page will be accessible. All custom pages are prefixed with `/p/`. For example, a path of `privacy` will be available at `/p/privacy`.
-- **Include in Footer**: A toggle that determines if a link to this page should automatically appear in the website's footer navigation.
+Markdown is the default format and is the best option for most pages. It supports headings, paragraphs, links, lists, quotes, code, and tables without exposing layout or theme controls.
 
-## Design and Content
+Use the **Write** and **Preview** tabs to check the rendered result before saving.
 
-VideoCMS integrates a visual editor (GrapesJS) to help you design your pages without writing HTML manually. You can:
+## Advanced HTML
 
-- Build layouts using a drag-and-drop interface.
-- Start from practical templates such as imprint, privacy policy, terms, about, contact, and FAQ pages.
-- Use reusable layout, content, and component blocks for cards, callouts, FAQ groups, tables, contact details, and legal text.
-- Style elements directly within the editor.
-- Preview your changes with the same VideoCMS theme colors used by the public page.
+HTML mode accepts an HTML fragment for cases where Markdown is not enough. VideoCMS sanitizes the fragment before previewing or publishing it. Scripts, embeds, inline styles, event handlers, and unsafe URLs are removed.
 
-The page builder uses VideoCMS-specific block classes, so newly created pages render consistently on public `/p/...` routes without depending on external Tailwind or DaisyUI CDN styles.
+The public page still uses VideoCMS typography, spacing, colors, and responsive behavior. Full HTML documents and custom JavaScript are not supported.
 
-## Typical Use Cases
+## Hiding a Page
 
-Custom webpages are ideal for:
+Turn off **Published** to remove a page from public access without deleting its content. Hidden pages:
 
-- **Impressum / Legal Notice**
-- **Data Privacy Policy**
-- **System Policies**
-- **Terms and Conditions**
-- **About Us pages**
+- remain available to admins;
+- are removed from footer navigation;
+- return `404` at their previous public path.
 
-## Technical Implementation
-
-Public pages are rendered dynamically based on their path. When a user visits `/p/[slug]`, VideoCMS fetches the corresponding HTML content and renders it within the standard site layout.
+Publishing the page again restores its URL and its footer preference.

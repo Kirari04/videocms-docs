@@ -36,7 +36,7 @@ Learn how to manage your content and users effectively.
 - **[User Management](./user-management.md)**
   Manage roles, permissions, and registration settings.
 - **[Customization](./customization.md)**
-  Create static webpages and themes directly from the dashboard.
+  Publish supporting Markdown or HTML pages directly from the dashboard.
 - **[Subtitles (PGS Support)](./subtitles.md)**
   Enabling high-quality image-based subtitle rendering.
 
