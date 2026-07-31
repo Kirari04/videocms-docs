@@ -49,6 +49,7 @@ The recommended workflow starts the Nuxt frontend and hot-reloading Go backend t
     - installs the locked frontend dependencies with Bun;
     - starts Nuxt at `http://127.0.0.1:3000`;
     - starts Go with [Air](https://github.com/air-verse/air) at `http://127.0.0.1:3001`;
+    - injects a stable development-only storage encryption key so S3-compatible mounts can be configured locally;
     - proxies `/api`, player, captcha, icons, and media requests through Nuxt;
     - stops both processes cleanly when either one exits or you press `Ctrl+C`.
 
@@ -78,6 +79,7 @@ The backend reads its existing environment variables as usual. The development l
 - `DEV_BACKEND_URL`
 - `DEV_PUBLIC_ORIGIN`
 - `DEV_MEDIA_PATH`
+- `DEV_STORAGE_ENCRYPTION_KEY` (override with another base64-encoded 32-byte key; never reuse the default in production)
 
 ## Frontend Setup (Nuxt 4)
 
