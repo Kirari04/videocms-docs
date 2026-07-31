@@ -18,17 +18,20 @@ The database contains all application metadata, including user accounts, video r
 *   **SQLite WAL Mode:** VideoCMS uses SQLite in Write-Ahead Logging (WAL) mode. This means that data is frequently written to temporary `-wal` and `-shm` files before being merged into the main `.db` file.
 *   **Backup Requirement:** To ensure a consistent and non-corrupt database backup, **the VideoCMS application should be stopped** before the database files are copied. This ensures all pending transactions are flushed to disk.
 
-### 2. Media Assets (`./videos`)
-This directory houses all binary data related to your videos.
+### 2. Media Assets (`./videos` and remote mounts)
+This directory houses local binary data related to your videos. If you configured additional storage mounts, their buckets or object stores are equally part of the media backup set.
 
 *   **Processed Content (`qualitys/`):** All transcoded HLS segments, thumbnails, and subtitle files are stored here, organized by video UUID. **This is the most critical media directory to backup**, as it contains the files served to your users.
 *   **Temporary Data (`uploads/`):** This directory is used as a temporary staging area for chunked uploads and file assembly. Once a video is fully processed, its source files are removed. **Backing up the `uploads/` directory is not required.**
+*   **Remote Mounts:** Back up or replicate each configured remote bucket according to your storage provider's procedures. VideoCMS places each file on one mount and does not provide replication itself.
 
 ### 3. Configuration & Infrastructure
 The following files define your environment and should be included in your backup:
 *   **`docker-compose.yaml`**: Defines your service and volume definitions.
 *   **`.env`**: (Optional) If you have a customized setup using an environment file for additional configuration.
 *   **`Caddyfile`**: (Optional) Your reverse proxy and SSL configuration if you are using Caddy.
+
+If remote mounts are configured, the `StorageEncryptionKey` value is critical backup material. Restoring the database with the same key makes its encrypted mount credentials usable immediately. If the key is lost or changed, the media is not deleted, but the saved credentials cannot be decrypted; set a new key and re-enter the credentials for each affected mount before reconnecting it.
 
 ---
 

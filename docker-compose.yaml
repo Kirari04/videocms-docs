@@ -5,6 +5,9 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    environment:
+      # Generate with: openssl rand -base64 32
+      StorageEncryptionKey: "${StorageEncryptionKey:-}"
     volumes:
       - ./videos:/app/videos
       - ./database:/app/database
