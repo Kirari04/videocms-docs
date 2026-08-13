@@ -51,6 +51,7 @@ export default withMermaid(defineConfig({
         text: 'Operations',
         items: [
           { text: 'Production Deployment', link: '/operations/production' },
+          { text: 'Storage Pools', link: '/operations/storage' },
           { text: 'Cloudflare Setup', link: '/operations/cloudflare' },
           { text: 'Security', link: '/operations/security' },
           { text: 'Backup & Restore', link: '/operations/backup-restore' },

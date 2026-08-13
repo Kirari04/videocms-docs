@@ -77,7 +77,18 @@ VideoCMS is configured using environment variables. This page lists all availabl
 | `FolderVideoQualitysPriv` | Private path for encoded videos. | `./videos/qualitys` |
 | `FolderVideoQualitysPub` | Public URL path for encoded videos. | `/videos/qualitys` |
 | `FolderVideoUploadsPriv` | Private path for uploaded raw files. | `./videos/uploads` |
+| `StorageScratchDir` | Local staging directory used while remote objects are encoded or otherwise processed. | `./videos/scratch` |
 | `StatsDriveName` | Drive name for disk stats (e.g., `nvme0n1`). | `nvme0n1` |
+
+## Additional Storage
+
+Additional storage mounts and upload pools are configured in **Administration → Storage**. Local storage remains available by default, so no storage environment variables are required for a local-only installation.
+
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `StorageEncryptionKey` | Base64-encoded 32-byte key used to encrypt remote-mount credentials. Generate it with `openssl rand -base64 32`. Required before an administrator can save a remote mount. Back it up with the database. | - |
+
+See the [Storage Pools guide](../operations/storage.md) for mount, routing, migration, and recovery instructions.
 
 ## CDN Integration
 

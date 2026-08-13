@@ -49,4 +49,10 @@ The persistent download-jobs release automatically creates `download_jobs` and a
 
 The old synchronous `/:UUID/:QUALITY/download/:FILE` attachment endpoint has been removed. Integrations must use the create/status/file download-job flow documented in the [API reference](../reference/api.md). The progressive MP4 player endpoint is unchanged.
 
+### Storage mounts and pools
+
+The storage-pools release is also automatic. On first start, VideoCMS creates the new storage tables, registers the existing media directory as the built-in `local` mount, creates a local upload pool, and assigns legacy file records to local storage. Existing media stays in place and does not need to be moved or re-uploaded.
+
+The only operator setup is for optional remote storage: configure `StorageEncryptionKey` before saving an S3-compatible mount. Instances that continue using only local storage need no new environment variable. See [Storage Pools](./storage.md) for setup and migration details.
+
 If a major breaking change ever requires manual intervention, it will be prominently listed in the [Changelog](../development/changelog.md).
