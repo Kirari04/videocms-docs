@@ -73,6 +73,12 @@ Any additional mount can be detached even when it owns files. Detaching:
 
 Unavailable files remain visible in the library, but playback and export are disabled until their storage is reconnected.
 
+### Permanently remove a mount
+
+After detaching a mount, you can select **Delete mount** to remove it from VideoCMS. This permanently deletes the saved mount configuration, encrypted credentials, and upload-pool memberships. It does not delete or change any objects in the bucket.
+
+File records that belonged to the deleted mount remain unavailable in VideoCMS. To recover them later, add a mount that points to the matching storage location and run **Scan and reconnect files**. Before deleting a mount, check the confirmation for upload pools that will be left without a member and update those pools before routing new uploads to them.
+
 To reconnect the same bucket, select **Mount**. To move to a replacement bucket or endpoint, detach the mount, preserve the same per-file object paths below the configured prefix, update the mount, and connect it again. VideoCMS validates persisted source and completed output-manifest objects before relinking a file record. It does not treat an empty UUID-shaped directory as a match.
 
 The **Scan and reconnect files** action can preview matches before applying them. Scans use bounded concurrency and apply results in batches, so retrying after an interruption safely resumes the remaining work. Connecting a brand-new mount also scans for records whose previous mount is unavailable.
