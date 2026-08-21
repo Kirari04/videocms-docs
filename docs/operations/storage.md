@@ -154,6 +154,8 @@ If a cache transfer fails, VideoCMS retries it as an administrator-visible backg
 
 The **Delivery traffic** section on **Administration → Storage** shows the last 30 days of playback bytes and requests served from primary storage versus read cache. Each pool shows its cache share, and the mount table shows the traffic that actually reached each backend. A cache hit is counted against the cache mount; a miss is counted against the primary mount.
 
+These counters can lag playback by a few seconds because VideoCMS saves delivery activity in small batches to keep the database responsive during busy playback. If a batch cannot be saved, the Storage page shows a warning while VideoCMS keeps the activity in memory and retries it; video delivery itself is unaffected. Delivery history older than 90 days is removed automatically.
+
 For a single media request, browser developer tools can inspect the `X-VideoCMS-Cache` response header. `FILLING` means the response came from primary storage and an on-demand cache fill is in progress; `HIT` means the response came from a read cache. `MISS` means no usable cached copy was available, while `BYPASS` means the requested file is not routed through a pool with a read cache.
 
 Storage attribution begins after upgrading to a version that provides these figures. Older traffic is left unassigned instead of being estimated, and VideoCMS does not scan or prefill existing media to produce the statistics.
