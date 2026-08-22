@@ -191,6 +191,7 @@ Base URL: `/api`
 - `GET /stats`: Get system statistics.
 - `GET /stats/traffic`: Get global combined delivery traffic plus player/download source series.
 - `GET /stats/traffic/top`: Get global top traffic stats.
+- `GET /stats/storage/delivery`: Get primary-versus-cache delivery history with pool and mount attribution.
 - `GET /stats/upload`: Get global upload stats.
 - `GET /stats/upload/top`: Get global top upload stats.
 - `GET /stats/encoding`: Get global encoding stats.
