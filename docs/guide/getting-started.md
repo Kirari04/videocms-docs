@@ -89,5 +89,7 @@ On the first startup, a default user with the username `admin` and the password 
 ## Next Steps
 
 -   **Upload a Video:** Go to `http://localhost:3000/my/videos` to upload your first video.
+-   **Watch Background Work:** Open **Jobs** for your own upload and encoding progress. Administrators can inspect all queues and maintenance work under **Administration → Background jobs**.
+-   **Add Storage:** Keep the built-in local pool or follow [Storage Pools](../operations/storage.md) to add S3-compatible or SFTP capacity, migrations, and optional read caches.
 -   **Secure your Instance:** Read the [Security Cookbook](../operations/security.md) to change default passwords and keys.
 -   **Deploy to Production:** Ready to go live? See [Production Deployment](../operations/production.md).

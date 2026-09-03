@@ -24,6 +24,9 @@ services:
   videocms:
     image: kirari04/videocms:beta
     restart: unless-stopped
+    environment:
+      # Required only before saving S3-compatible or SFTP mounts.
+      StorageEncryptionKey: "${StorageEncryptionKey:-}"
     volumes:
       - ./videos:/app/videos
       - ./database:/app/database
@@ -41,6 +44,8 @@ services:
 volumes:
   caddy_data: {}
 ```
+
+Generate `StorageEncryptionKey` with `openssl rand -base64 32` before configuring remote storage, and preserve it with your backups. Local-only installations can leave it empty. Do not mount `/app/public`; frontend assets are part of the image and must change when the container is upgraded.
 
 ### `Caddyfile`
 

@@ -74,10 +74,29 @@ VideoCMS is currently in its **Beta** phase.
 
 ### Unreleased
 
-- Added SFTP storage mounts with password or private-key login, required host-key verification, safe file replacement checks, and reconnectable storage folders.
+No user-facing changes are currently documented after v0.2.0.
+
+### v0.2.0 — 2026-09-03
+
+- Added provider-neutral media storage with a built-in local mount, administrator-managed S3-compatible and SFTP mounts, upload pools, per-account routing, encrypted remote credentials, detach/remount health checks, and safe file reconnection.
+- Added resumable whole-pool and account-scoped storage migrations with fixed preflight plans, verified copies, per-video atomic cutover, pause/resume/cancel/retry controls, and guarded source cleanup after a 24-hour retention window.
+- Added optional on-demand read caches with origin fallback, verified cache fills, LRU and free-space eviction, background repair visibility, and primary-versus-cache delivery charts in System Stats.
+- Replaced separate long-running workers with one durable background-job runtime for uploads, imports, remote downloads, encoding, thumbnails, prepared downloads, deletions, migrations, cache work, auditing, and maintenance.
+- Added user job progress and an administrator task center with attempt history, redacted diagnostics, queue controls, schedules, supervised-service health, pause checkpoints, retry classification, and restart recovery.
+- Batched delivery accounting away from the SQLite request path and added storage-attributed traffic retention and failure visibility.
+- Improved encoder lifecycle reliability, migration diagnostics, storage cleanup safety, and cache behavior for legacy media generations.
+- Stopped persisting packaged frontend assets in `/app/public`, preventing stale frontend files from surviving image upgrades.
+- Updated Go, frontend, and AWS SDK dependencies.
+
+The database and local-media upgrade is automatic. Configure `StorageEncryptionKey` only when using remote mounts, preserve that key in backups, and ensure `StorageScratchDir` has enough temporary capacity for remote processing. See the [Upgrade Guide](/operations/upgrade) for the release checklist.
+
+### v0.1.11 — 2026-07-30
+
 - Added persistent, deduplicated public download preparation jobs with queue position, FFmpeg progress, best-effort ETA, restart recovery, six-hour artifact retention, and Range delivery.
+- Added configurable MP4 or MKV downloads with quality, audio, and subtitle selection without re-encoding.
 - Split delivery statistics into player and prepared-file download traffic while preserving combined totals.
 - Added admin limits for preparation concurrency, queue size, and artifact retention.
+- Replaced the website builder with simpler Markdown or sanitized HTML pages and refreshed the dashboard, library, uploader, and CAPTCHA interface.
 - Removed the synchronous attachment endpoint; progressive MP4 playback is unchanged.
 
 The following are the latest changes across the core and frontend repositories:

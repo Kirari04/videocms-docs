@@ -17,17 +17,23 @@ hero:
       link: /guide/index
 
 features:
-  - title: Selfhost
-    details: Selfhost VideoCMS using Docker on your own hardware
+  - title: Self-hosted
+    details: Run VideoCMS with Docker on your own hardware
   - title: Pretty Subtitles
-    details: Subtitles stored as softsub in the ASS format to keep the style and save storage
+    details: Preserve subtitle styling with space-efficient soft subtitles
   - title: HLS Multi-Quality
-    details: The video will be converted into multiple qualities to ensure fast playback
+    details: Encode multiple qualities for smooth playback across connection speeds
   - title: Multi-Audio
-    details: The player supports multiple audio tracks that arent stored inside the video to save storage
+    details: Offer multiple independently stored audio tracks in the player
   - title: Fast Chunked Upload
-    details: This allows the server to be behind a proxy without having crazy high maximum post limits
-  - title: Dynamic MKV Download
-    details: The server assembles the subtitles, audio tracks and video tracks dynamicly during the download without re-encoding
+    details: Resume uploads through a reverse proxy without requiring full-file request limits
+  - title: Configurable Downloads
+    details: Prepare MP4 or MKV downloads with selected qualities, audio, and subtitles without re-encoding
+  - title: Storage Pools
+    details: Route media across local, S3-compatible, and SFTP storage and migrate it safely between pools
+  - title: Read Caches and Insights
+    details: Cache remote playback on demand and measure primary-versus-cache delivery in System Stats
+  - title: Durable Background Jobs
+    details: Follow long-running work with persistent progress, retries, pause, and cancellation controls
 
 ---

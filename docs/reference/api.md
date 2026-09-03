@@ -103,6 +103,32 @@ You can find the API key management tools at the following path:
 - **Navigation:** Settings (gear icon) -> API Management tab.
 - **URL:** `/my/settings`
 
+### Background Jobs (v2)
+
+Base URL: `/api/v2`. These routes are owner-scoped and return only work visible to the authenticated user.
+
+- `GET /jobs`: List jobs with cursor pagination and optional status, kind, queue, and search filters.
+- `GET /jobs/:id`: Get a job, its tasks, attempts, progress, and event history.
+- `POST /jobs/:id/cancel`: Request cancellation at the next safe checkpoint.
+- `POST /jobs/:id/retry`: Retry an eligible failed or canceled job.
+- `POST /jobs/:id/pause`: Pause a job that supports durable checkpoints.
+- `POST /jobs/:id/resume`: Resume a paused job.
+
+The v2 submission routes return `202 Accepted` with a `Location` header pointing to the job resource:
+
+- `POST /uploads/simple`: Upload and enqueue import of one file.
+- `POST /uploads/:upload_id/finalize`: Finalize a completed tus upload as a durable import job.
+- `POST /remote-downloads`: Enqueue one or more remote downloads.
+- `GET /remote-downloads`: List the authenticated user's remote-download records.
+- `POST /remote-downloads/:id/cancel`: Cancel a remote download.
+- `POST /remote-downloads/:id/retry`: Retry a terminal remote download.
+- `DELETE /remote-downloads/:id`: Remove one terminal remote-download record.
+- `DELETE /remote-downloads`: Clear matching terminal remote-download records.
+- `DELETE /file` and `DELETE /files`: Enqueue single or bulk file deletion.
+- `DELETE /folder` and `DELETE /folders`: Enqueue single or bulk folder deletion.
+
+Follow the returned job resource rather than polling legacy operation-specific state.
+
 ### Folders
 
 - `GET /folders`: List folders.
@@ -191,11 +217,65 @@ Base URL: `/api`
 - `GET /stats`: Get system statistics.
 - `GET /stats/traffic`: Get global combined delivery traffic plus player/download source series.
 - `GET /stats/traffic/top`: Get global top traffic stats.
+- `GET /stats/storage/delivery`: Get primary-versus-cache delivery history with pool and mount attribution.
 - `GET /stats/upload`: Get global upload stats.
 - `GET /stats/upload/top`: Get global top upload stats.
 - `GET /stats/encoding`: Get global encoding stats.
 - `GET /stats/encoding/top`: Get global top encoding stats.
 - `GET /stats/storage/top`: Get global top storage stats.
+
+### Background Operations (v2)
+
+Base URL: `/api/v2/admin`.
+
+- `GET /jobs`: List jobs across the installation.
+- `GET /jobs/summary`: Get status and queue totals.
+- `GET /jobs/:id`: Get full job diagnostics and attempt history.
+- `POST /jobs/:id/cancel`: Cancel an eligible job.
+- `POST /jobs/:id/retry`: Retry an eligible job.
+- `POST /jobs/:id/pause`: Pause a checkpoint-capable job.
+- `POST /jobs/:id/resume`: Resume a paused job.
+- `POST /tasks/:id/cancel`: Cancel one eligible task.
+- `POST /tasks/:id/retry`: Retry one eligible task.
+- `GET /task-queues`: List queue capacity, activity, and pause state.
+- `POST /task-queues/:name/pause`: Pause new work in a queue.
+- `POST /task-queues/:name/resume`: Resume a queue.
+- `GET /task-schedules`: List maintenance schedules and recent outcomes.
+- `POST /task-schedules/:key/run`: Start a maintenance schedule immediately.
+- `GET /task-runtime`: Get runtime, queue, schedule, and supervised-service health.
+
+### Storage Administration
+
+Base URL: `/api/admin/storage`.
+
+- `GET /`: Get mounts, pools, availability, capacity, and optional delivery attribution.
+- `POST /sftp/host-key`: Fetch an SFTP server host key without sending storage credentials.
+- `POST /mounts/test`: Test an S3-compatible or SFTP configuration without saving it.
+- `POST /mounts`: Create and connect a mount.
+- `PUT /mounts/:id`: Update a mount; location-defining fields require it to be detached.
+- `DELETE /mounts/:id`: Detach a mount without deleting its objects or configuration.
+- `DELETE /mounts/:id/forget`: Permanently remove the saved mount configuration.
+- `POST /mounts/:id/remount`: Connect a detached mount and validate its files.
+- `POST /mounts/:id/check`: Run a health check on a connected mount.
+- `POST /mounts/:id/reconnect`: Preview or apply database relinking for matching stored files.
+- `POST /pools`: Create an upload pool.
+- `PUT /pools/:id`: Update primary members, read caches, limits, or default state.
+- `DELETE /pools/:id`: Delete an unused pool without deleting media.
+- `POST /pools/:id/default`: Make a pool the instance default for new uploads.
+
+### Storage Migrations (v2)
+
+Base URL: `/api/v2/admin/storage/migrations`.
+
+- `POST /preview`: Validate a source, destination, and optional account scope and return a fixed migration plan.
+- `POST /`: Start the confirmed plan. Requires its plan fingerprint and an `Idempotency-Key` header.
+- `GET /`: List migrations and summary counts.
+- `GET /accounts`: Search accounts available for an account-scoped migration.
+- `GET /:id`: Get migration state and its main and cleanup jobs.
+- `GET /:id/items`: Page through per-video migration state.
+- `POST /:id/cancel`: Safely cancel a failed migration and release its reservations.
+- `POST /:id/keep-originals`: Keep remaining source copies instead of deleting them.
+- `POST /:id/start-cleanup`: Skip the remaining retention delay and begin guarded source cleanup.
 
 ### User Management
 

@@ -8,8 +8,8 @@ description: Comprehensive guides and documentation for VideoCMS Beta
 
 Welcome to the **VideoCMS Beta** documentation. VideoCMS is a high-performance, self-hosted video management system designed for hardware efficiency and ease of use.
 
-::: info STATUS: BETA (v0.1.0+)
-VideoCMS has transitioned from Alpha to Beta. The architecture is now unified, serving both the API and Frontend from a single service on port `3000`.
+::: info STATUS: BETA (v0.2.x)
+VideoCMS uses one service for the API and frontend on port `3000`, with durable background jobs and provider-neutral media storage built in.
 :::
 
 ## 🚀 Essentials

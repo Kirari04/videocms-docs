@@ -65,8 +65,9 @@ docker compose logs -f videocms
 ### "Database is locked"
 *   **Cause:** SQLite can only handle one write operation at a time. High traffic or a slow disk can cause this.
 *   **Solution:**
-    *   VideoCMS uses WAL mode to mitigate this, but extremely high concurrency might still trigger it.
+    *   VideoCMS uses WAL mode and saves delivery counters in batches, but unusually slow disks or another long-running writer can still trigger it.
     *   Ensure your database is on a fast local disk (SSD/NVMe), not a network share (NFS/CIFS).
+    *   Check **Administration → Background jobs** for a storage or maintenance task that is repeatedly failing, and check **Administration → Storage** for a delayed-statistics warning.
 
 ## Permission Issues
 
