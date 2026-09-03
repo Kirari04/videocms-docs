@@ -6,7 +6,9 @@ description: Configuration options for VideoCMS
 
 # Configuration
 
-VideoCMS is configured using environment variables. This page lists all available configuration options.
+VideoCMS combines startup environment variables with settings stored in its database. `Host`, the local storage paths, `StorageScratchDir`, `StorageEncryptionKey`, and `StatsDriveName` are read from the process environment at startup. Application, security, feature, limit, CDN, CAPTCHA, and encoding settings are managed from the administrator configuration page and persist in SQLite.
+
+The field names below match the configuration returned by the API and shown in the administrator interface. Restart VideoCMS after changing a startup environment variable or a setting whose interface indicates that a restart is required.
 
 
 ## General Settings
@@ -59,6 +61,7 @@ VideoCMS is configured using environment variables. This page lists all availabl
 | `RatelimitBurstWeb` | Web rate limit burst. | - |
 | `MaxItemsMultiDelete` | Max items for bulk deletion. | - |
 | `MaxRunningEncodes` | Max concurrent encoding jobs. | - |
+| `MaxParallelFFmpegTasks` | Shared capacity for encoding, thumbnails, and prepared downloads (1-16). Existing installations initially inherit the larger of their encode and download-preparation limits. | derived |
 | `MaxParallelDownloads` | Max concurrent remote download jobs. | `1` |
 | `RemoteDownloadTimeout` | Max seconds for one remote download. | `3600` |
 | `MaxParallelDownloadPreparations` | Max concurrent FFmpeg packaging jobs for public downloads (1-8). | `1` |

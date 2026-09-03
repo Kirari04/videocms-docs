@@ -1,12 +1,12 @@
 ---
 lang: en-US
 title: Architecture
-description: Under the hood of VideoCMS - Encoding pipeline and Storage structure.
+description: How VideoCMS coordinates HTTP delivery, durable background work, and provider-neutral media storage.
 ---
 
 # Architecture
 
-VideoCMS v0.1.0 (Beta) uses a unified architecture where the backend (API) and frontend (Panel) are served by a single service.
+VideoCMS v0.2.x uses a unified Go service for the API, media delivery, and packaged frontend. SQLite stores application state and the durable work queue, while a provider-neutral storage layer keeps media on local disk, S3-compatible storage, or SFTP.
 
 ## High-Level Overview
 
@@ -15,11 +15,26 @@ graph TD
     User((User)) -->|HTTPS| Proxy[Reverse Proxy]
     Proxy -->|Port 3000| CMS[VideoCMS Unified Service]
     CMS -->|SQLite| DB[(Database)]
-    CMS -->|Filesystem| Storage[/videos/qualitys/]
+    CMS --> Jobs[Durable Background Runtime]
+    Jobs --> FFmpeg[FFmpeg Workers]
+    CMS --> Media[Media Storage Service]
+    Jobs --> Media
+    Media --> Local[Local Mount]
+    Media --> S3[S3-Compatible Mounts]
+    Media --> SFTP[SFTP Mounts]
+    Media --> Cache[Optional Read Caches]
+    FFmpeg --> Scratch[Local Scratch Workspace]
+    Scratch --> Media
     CMS -.->|Internal| PGS[PGS Plugin]
 ```
 
 ## Service Components
+
+- **HTTP service:** serves the frontend, REST API, player pages, authorized media, resumable uploads, and prepared downloads.
+- **SQLite database:** stores users, media metadata, settings, storage topology, delivery statistics, and durable job state.
+- **Background runtime:** coordinates task attempts, retries, cancellation, pause checkpoints, queue capacity, schedules, and crash recovery.
+- **Storage service:** resolves every file to its authoritative mount and validated object key, then provides range reads, atomic writes, walking, and deletion through a common interface.
+- **Scratch workspace:** materializes remote inputs and assembles outputs for tools such as FFmpeg. Scratch data is temporary and is never the authoritative media copy.
 
 
 ## The Transcoding Pipeline
@@ -33,8 +48,19 @@ VideoCMS uses a prioritized queue system to handle video processing. This ensure
 4.  **Hashing:** A SHA256 hash is generated to detect duplicate files. If a duplicate is found, the new upload acts as a "symlink" to the existing file (Database-level cloning), saving storage space.
 5.  **Registration:** The valid file is registered in the database and queued for media processing.
 
-### 2. The Worker Loop
-The backend runs a background service (`services/Encoder.go`) that wakes up every 10 seconds to look for pending tasks. It processes them in this specific order:
+### 2. Durable Job Pipeline
+
+Long-running operations are persisted as jobs containing one or more tasks. Upload import, remote download, encoding, thumbnails, deletion, prepared downloads, storage migration, cache repair, and maintenance all use the same runtime. A restart preserves queued work and recovers interrupted attempts where retrying is safe.
+
+Tasks run through bounded queues:
+
+- `ffmpeg` for encoding, thumbnails, and prepared downloads;
+- `network` for remote downloads;
+- `storage` for imports, migrations, deletion, and cache repair;
+- `maintenance` for cleanup and reconciliation; and
+- `audit` for API-key audit records.
+
+For a normal media import, the required source validation and registration work completes before optional processing is scheduled:
 
 1.  **Subtitles (Priority 1):**
     *   Extracts embedded subtitles from the source file.
@@ -51,6 +77,8 @@ The backend runs a background service (`services/Encoder.go`) that wakes up ever
     *   Uses **HLS (HTTP Live Streaming)** with `libx264`.
     *   **Settings:** 4-second segments, Closed GOP, YUV420p.
 
+Users can follow their own work from **Jobs**. Administrators can inspect all jobs, attempts, queues, schedules, and supervised-service health from **Background jobs**.
+
 ## Download Preparation Queue
 
 Public downloads are prepared by a separate persistent worker rather than inside the attachment request:
@@ -66,10 +94,11 @@ Preparation reads are internal filesystem work and do not count as delivery traf
 
 ## Storage Structure
 
-VideoCMS uses a flat-folder structure where the **Video UUID** is the root folder for that asset.
+Every file record names one authoritative storage mount and a validated object key. Pools decide where new uploads are placed, but changing a pool never moves existing media; migrations perform that work explicitly and switch each video only after its destination copy verifies successfully.
 
-### `./videos` Directory
-This is the main storage volume. You should **never** manually delete files here unless you know what you are doing, as it will break database references.
+### Local mount layout
+
+The built-in local mount keeps the compatible UUID-based object layout below `FolderVideoQualitysPriv`. Do not manually move or delete authoritative files because database records retain their mount and object keys.
 
 ```text
 ./videos/
@@ -77,9 +106,11 @@ This is the main storage volume. You should **never** manually delete files here
 │   ├── tus/                  # Active tus upload resources and metadata
 │   ├── download-jobs/        # Expiring prepared download artifacts
 │   └── {file_uuid}.tmp       # Finalized raw video before/while import
+├── scratch/                  # Temporary remote inputs and FFmpeg outputs
 │
-└── qualitys/                 # Permanent storage for processed media
+└── qualitys/                 # Built-in local storage mount
     └── {video_uuid}/         # The processed video folder (HLS assets)
+        ├── source/           # Authoritative imported source
         ├── {quality_name}/   # e.g., "1080p", "720p"
         │   ├── index.m3u8    # Playlist for this specific quality
         │   ├── segment0.ts   # Video segment 0
@@ -92,6 +123,14 @@ This is the main storage volume. You should **never** manually delete files here
         └── {subtitle_uuid}/  # Subtitle Track 1
             └── subtitle.vtt  # The subtitle file
 ```
+
+S3-compatible and SFTP mounts use the same relative keys below their configured object prefix or remote folder. This keeps media routing independent from provider-specific filesystem behavior.
+
+### Read caches and scratch data
+
+A pool can use one or more mounts as disposable read caches. Playback always has an authoritative primary copy; cache misses and failures fall back to that copy. Cache entries populate on demand, are verified before use, and are evicted by least-recently-used activity and free-space limits.
+
+`StorageScratchDir` is separate from authoritative storage. FFmpeg and other path-based tools materialize remote inputs there and publish completed output trees back through the storage service. Interrupted and expired scratch artifacts are reconciled by maintenance jobs.
 
 ### Where is `master.m3u8`?
 You won't find a `master.m3u8` file on the disk. VideoCMS generates the Master Playlist **dynamically** on the fly when a user requests it.
@@ -110,8 +149,13 @@ VideoCMS uses **SQLite** in WAL (Write-Ahead Logging) mode.
 *   **`qualities`, `audios`, `subtitles`:** Store the status (`Ready`, `Encoding`, `Failed`) of each asset.
 *   **`download_jobs`:** Stores public download manifests, queue/progress state, output metadata, and expiry.
 *   **`traffic_logs`:** Stores delivered bytes classified as `player` or `download`.
+*   **Storage tables:** Store mounts, encrypted provider configuration, pools, primary/cache membership, migration plans, per-video checkpoints, and delayed cleanup state.
+*   **Background tables:** Store jobs, tasks, attempts, lifecycle events, queue pause state, schedules, and one-time migration state.
+*   **Delivery buckets:** Store batched primary-versus-cache traffic attribution for System Stats. Older buckets expire automatically.
 
 ## Scaling Implications
 
-*   **CPU:** The "Worker Loop" is CPU-intensive. Since it runs inside the API binary, scaling the API horizontally (multiple replicas) requires a shared filesystem (NFS) for `./videos` and a shared database, which SQLite does not support well across networks.
-*   **Storage:** Local media stays in `./videos`. Administrators can also connect S3-compatible buckets or SFTP folders and route new uploads through storage pools.
+*   **CPU:** FFmpeg is CPU-intensive. `MaxParallelFFmpegTasks` bounds shared FFmpeg work, while operation-specific settings further limit encodes and prepared downloads.
+*   **Database:** SQLite and the embedded background runtime are designed for one VideoCMS application instance. Do not run multiple replicas against a database on a network filesystem.
+*   **Storage:** Local media stays under the videos volume. S3-compatible or SFTP mounts can expand authoritative capacity, while optional read caches reduce repeated remote reads.
+*   **Scratch capacity:** Remote encoding and migration work can temporarily use local scratch space and host bandwidth. Size and monitor `StorageScratchDir` accordingly.
