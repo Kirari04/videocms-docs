@@ -6,7 +6,7 @@ description: How VideoCMS coordinates HTTP delivery, durable background work, an
 
 # Architecture
 
-VideoCMS v0.2.x uses a unified Go service for the API, media delivery, and packaged frontend. SQLite stores application state and the durable work queue, while a provider-neutral storage layer keeps media on local disk, S3-compatible storage, or SFTP.
+VideoCMS v0.1.12 uses a unified Go service for the API, media delivery, and packaged frontend. SQLite stores application state and the durable work queue, while a provider-neutral storage layer keeps media on local disk, S3-compatible storage, or SFTP.
 
 ## High-Level Overview
 

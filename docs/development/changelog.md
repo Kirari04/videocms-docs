@@ -74,9 +74,9 @@ VideoCMS is currently in its **Beta** phase.
 
 ### Unreleased
 
-No user-facing changes are currently documented after v0.2.0.
+No user-facing changes are currently documented after v0.1.12.
 
-### v0.2.0 — 2026-09-03
+### v0.1.12 — 2026-09-03
 
 - Added provider-neutral media storage with a built-in local mount, administrator-managed S3-compatible and SFTP mounts, upload pools, per-account routing, encrypted remote credentials, detach/remount health checks, and safe file reconnection.
 - Added resumable whole-pool and account-scoped storage migrations with fixed preflight plans, verified copies, per-video atomic cutover, pause/resume/cancel/retry controls, and guarded source cleanup after a 24-hour retention window.

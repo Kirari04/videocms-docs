@@ -12,9 +12,9 @@ VideoCMS is designed to be easily upgradable using Docker. We currently recommen
 
 If you are still running v0.0.9 (Alpha), which used separate `api` and `panel` containers, please follow our [v0.0.9 to v0.1.0 Migration Guide](./migration-alpha-beta.md) before proceeding with standard upgrades.
 
-## Upgrading from v0.1.11 to v0.2.0
+## Upgrading from v0.1.11 to v0.1.12
 
-v0.2.0 introduces provider-neutral storage, S3-compatible and SFTP mounts, upload pools, resumable storage migrations, optional read-through caches, and the unified background-job runtime. The database upgrade is automatic and existing local media stays in place.
+v0.1.12 introduces provider-neutral storage, S3-compatible and SFTP mounts, upload pools, resumable storage migrations, optional read-through caches, and the unified background-job runtime. The database upgrade is automatic and existing local media stays in place.
 
 Before upgrading:
 
