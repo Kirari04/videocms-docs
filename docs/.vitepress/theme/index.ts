@@ -2,11 +2,14 @@ import DefaultTheme from 'vitepress/theme'
 import { onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vitepress'
 import mediumZoom from 'medium-zoom'
-import '../../../node_modules/vitepress-plugin-tabs/dist/client/browser/index.css'
+import { enhanceAppWithTabs } from 'vitepress-plugin-tabs/client'
 import './custom.css'
 
 export default {
   extends: DefaultTheme,
+  enhanceApp({ app }) {
+    enhanceAppWithTabs(app)
+  },
   setup() {
     const route = useRoute()
     const initZoom = () => {
