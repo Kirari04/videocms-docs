@@ -24,8 +24,8 @@ The field names below match the configuration returned by the API and shown in t
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
-| `JwtSecretKey` | Secret key for JWT authentication. **Change this!** | - |
-| `JwtMediaSecretKey` | Secret key for player media cookies. Rotating it invalidates active playback cookies. | - |
+| `JwtSecretKey` | Server-managed JWT signing key. Hidden from the API; rotate through **Config → Security**. | - |
+| `JwtMediaSecretKey` | Server-managed media signing key. Hidden from the API; explicit rotation resets active playback cookies. | - |
 | `TrustedProxies` | Comma-separated list of trusted proxy IPs. | - |
 | `TrustLocalTraffic` | Whether to trust local traffic (true/false). | - |
 | `CorsAllowOrigins` | Allowed CORS origins. | - |

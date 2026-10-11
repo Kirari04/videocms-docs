@@ -288,8 +288,9 @@ Base URL: `/api/v2/admin/storage/migrations`.
 
 ### Settings & Pages
 
-- `GET /settings`: Get system settings.
-- `PUT /settings`: Update system settings.
+- `GET /settings`: Get system settings with signing keys omitted and captcha private keys redacted. `Captcha_*_PrivateKeyConfigured` flags indicate saved keys.
+- `PUT /settings`: Update system settings. Signing keys cannot be changed here; blank or omitted captcha private keys preserve saved values.
+- `POST /settings/rotate-signing-keys`: Admin-only rotation of both server-generated signing keys. Requires `{ "confirm": true }`; returns `204` and invalidates existing session and media tokens.
 - `GET /pages`: List all static pages, including hidden pages.
 - `GET /page/:id`: Get a static page for editing.
 - `POST /page`: Create a Markdown or HTML static page.
@@ -305,3 +306,7 @@ Base URL: `/api/v2/admin/storage/migrations`.
 
 - `GET /move`: Move items (Controller: `MoveItemsController`).
 - `GET /versioncheck`: Check for updates.
+
+## Session Logout
+
+`POST /auth/logout` with `Authorization: Bearer <session-token>` returns `204` after persistently revoking that session and its refreshed tokens. Other sessions and API keys are unaffected. API keys cannot be revoked through this endpoint.

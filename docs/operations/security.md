@@ -18,15 +18,21 @@ The default admin account is created with known credentials.
 3.  Change the password for the `admin` user immediately.
 4.  Alternatively, create a new admin user with a secure password and delete the default `admin` user.
 
-## 2. Update Secret Keys
+## 2. Signing Keys and Sessions
 
-The application uses JWT tokens for session management and media playback cookies. You **must** change the secret keys to prevent attackers from forging sessions or media access.
+VideoCMS generates independent cryptographically random signing keys for authentication and media playback. Keys stay on the server and are not returned by the settings API. Upgrading automatically replaces the two known predictable defaults from older installations; this signs out affected sessions and resets playback cookies. Custom signing keys remain unchanged.
 
-1.  Go to the **Config** page (`/my/config`).
-2.  Find **JwtSecretKey**. Generate a long, random string and paste it here.
-3.  Find **JwtMediaSecretKey**. Generate another long, random string and paste it here.
-4.  **Save** the configuration.
-5.  **Restart** the application containers for the changes to take effect.
+To rotate both keys deliberately, open **Config → Security**, select **Rotate signing keys**, and confirm. The change takes effect immediately, signs everyone out, and resets active playback sessions. Ordinary configuration saves do not rotate keys.
+
+**Log out** revokes that browser's session on the server, including refreshed tokens from the same session. Other sessions and API keys remain valid. Existing seven-day session expiry and automatic refresh behavior are preserved; password or role changes still revoke all of an account's sessions.
+
+Captcha secret fields are write-only: a blank field keeps the saved value, and entering a replacement updates it. Public site keys remain visible.
+
+## Public Video Links
+
+Videos are public by default and shared through unlisted, random UUID links. Anyone who has a player link can watch the video without a VideoCMS account, subject to the instance's player captcha settings. Player, status, download-selection and thumbnail URLs follow this public-link model. Media cookies authorize the renditions, audio, subtitles and downloads belonging to that link; they are playback capabilities, not private account permissions.
+
+Treat the full link as shareable access to the video. Deleting a link removes its public entry point. The library and editing APIs still require account authentication and enforce ownership.
 
 ## 3. Disable Debug/Dev Modes
 

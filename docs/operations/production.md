@@ -141,7 +141,7 @@ Deploying the containers is only the first step. You **must** perform these acti
 ### 1. Change Secret Keys
 By default, the application might use insecure or placeholder keys for signing session tokens.
 - Navigate to **Settings** (`/my/config`).
-- Change `JwtSecretKey` and `JwtMediaSecretKey` to long, random strings.
+- Signing keys are generated securely and kept on the server. Use **Config → Security → Rotate signing keys** when deliberate rotation is needed; it signs everyone out and resets playback sessions.
 - **Restart the containers** after saving.
 
 ### 2. Trust Reverse Proxy (IP Identification)
